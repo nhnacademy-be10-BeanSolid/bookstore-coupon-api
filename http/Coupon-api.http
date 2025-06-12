@@ -1,0 +1,102 @@
+### 쿠폰 등록
+POST http://localhost:8080/api/coupons/policy
+Content-Type: application/json
+
+{
+  "couponName": "가입 축하 10% 할인 (최대 5천원)",
+  "couponDiscountType": "PERCENT",
+  "couponDiscountAmount": 10,
+  "couponMinimumOrderAmount": 10000,
+  "couponMaximumDiscountAmount": 5000,
+  "couponScope": "ALL",
+  "couponExpiredAt": "2025-12-31T23:59:59",
+  "couponIssuePeriod": null,
+  "bookIds": [],
+  "categoryIds": []
+}
+
+### 2번째 쿠폰 등록
+POST http://localhost:8080/api/coupons/policy
+Content-Type: application/json
+
+{
+"couponName": "2만원 이상 구매 시 3천원 할인",
+"couponDiscountType": "AMOUNT",
+"couponDiscountAmount": 3000,
+"couponMinimumOrderAmount": 20000,
+"couponMaximumDiscountAmount": null,
+"couponScope": "ALL",
+"couponExpiredAt": "2025-12-31T23:59:59",
+"couponIssuePeriod": null,
+"bookIds": [],
+"categoryIds": []
+}
+
+### 3번째 쿠폰 등록
+POST http://localhost:8080/api/coupons/policy
+Content-Type: application/json
+
+{
+  "couponName": "가입 축하 1만원 할인 쿠폰",
+  "couponDiscountType": "FIXED",
+  "couponDiscountAmount": 10000,
+  "couponMinimumOrderAmount": 50000,
+  "couponMaximumDiscountAmount": 0,
+  "couponScope": "ALL",
+  "couponExpiredAt": "2025-12-31T23:59:59",
+  "couponIssuePeriod": 30,
+  "bookIds": [],
+  "categoryIds": []
+}
+### 생일 쿠폰 정책
+POST http://localhost:8080/api/coupons/policy
+Content-Type: application/json
+
+{
+  "couponName": "Birthday Coupon",
+  "couponDiscountType": "PERCENT",
+  "couponDiscountAmount": 15,
+  "couponMinimumOrderAmount": 10000,
+  "couponMaximumDiscountAmount": 10000,
+  "couponScope": "ALL",
+  "couponExpiredAt": null,
+  "couponIssuePeriod": 30,
+  "bookIds": [],
+  "categoryIds": []
+}
+
+### 쿠폰 정책 상세 조회
+GET http://localhost:8080/api/coupons/policy/3
+Content-Type: application/json
+
+
+### 사용자에게 쿠폰 발급
+POST http://localhost:8080/api/coupons/users/1/issue/1
+Content-Type: application/json
+
+### 사용자 보유 쿠폰 조회
+GET http://localhost:8080/api/coupons/users/1
+Content-Type: application/json
+
+### 사용자 쿠폰 사용
+POST http://localhost:8080/api/coupons/users/1/use/1
+Content-Type: application/json
+
+### 할인 금액 계산 (기본)
+GET http://localhost:8080/api/coupons/users/1/calculate-discount/3?orderAmount=50000
+Content-Type: application/json
+
+### 할인 금액 계산 (특정 도서 포함)
+GET http://localhost:8080/api/coupons/users/1/calculate-discount/2?orderAmount=30000&bookIds=10
+Content-Type: application/json
+
+### 할인 금액 계산 (특정 카테고리 포함)
+GET http://localhost:8080/api/coupons/users/1/calculate-discount/3?orderAmount=30000&categoryIds=101
+Content-Type: application/json
+
+
+
+
+
+
+
