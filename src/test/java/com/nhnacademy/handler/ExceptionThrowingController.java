@@ -1,6 +1,6 @@
-package com.nhnacademy.handler; // GlobalExceptionHandlerTest와 같은 패키지에 위치
+package com.nhnacademy.handler;
 
-import com.nhnacademy.exception.*; // 당신의 예외 클래스들 import
+import com.nhnacademy.exception.*;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
