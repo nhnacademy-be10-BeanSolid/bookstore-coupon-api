@@ -10,11 +10,11 @@ import java.util.Optional;
 
 public interface UserCouponRepository extends JpaRepository<UserCoupon, Long> {
 
-    List<UserCoupon> findByUserId(Long userId);
+    List<UserCoupon> findByUserId(String userId);
 
     List<UserCoupon> findByStatusAndExpiredAtBefore(UserCouponStatus status, LocalDateTime dateTime);
 
-    List<UserCoupon> findByUserIdAndCouponPolicy(Long userId, CouponPolicy couponPolicy);
+    List<UserCoupon> findByUserIdAndCouponPolicy(String userId, CouponPolicy couponPolicy);
 
-    Optional<UserCoupon> findByUserIdAndUserCouponId(Long userId, Long userCouponId);
+    Optional<UserCoupon> findByUserIdAndUserCouponId(String userId, Long userCouponId);
 }

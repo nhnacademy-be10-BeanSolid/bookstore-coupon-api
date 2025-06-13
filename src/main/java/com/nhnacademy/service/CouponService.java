@@ -79,7 +79,7 @@ public class CouponService {
     }
 
     @Transactional
-    public UserCoupon issueCouponToUser(Long userId, Long couponPolicyId) {
+    public UserCoupon issueCouponToUser(String userId, Long couponPolicyId) {
         CouponPolicy policy = couponPolicyRepository.findById(couponPolicyId)
                 .orElseThrow(() -> new CouponNotFoundException("존재하지 않는 쿠폰 정책입니다. Policy ID: " + couponPolicyId));
 
@@ -107,7 +107,7 @@ public class CouponService {
         return userCouponRepository.save(userCoupon);
     }
 
-    public List<UserCoupon> getUserCoupons(Long userId) {
+    public List<UserCoupon> getUserCoupons(String userId) {
         return userCouponRepository.findByUserId(userId);
     }
 
@@ -117,15 +117,19 @@ public class CouponService {
     }
 
     @Transactional
-    public UserCoupon issueWelcomeCoupon(Long userId) {
+    public UserCoupon issueWelcomeCoupon(String userId) {
         CouponPolicy welcomePolicy = couponPolicyRepository.findByCouponName("Welcome Coupon")
                 .orElseThrow(() -> new WelcomeCouponPolicyNotFoundException("Welcome 쿠폰 정책을 찾을 수 없습니다."));
+        List<UserCoupon> existingWelcomeCoupons = userCouponRepository.findByUserIdAndCouponPolicy(userId, welcomePolicy);
 
+        if (!existingWelcomeCoupons.isEmpty()) {
+            throw new IllegalStateException(String.format("사용자 ID: %d에게 웰컴 쿠폰이 이미 발급되었습니다.", userId));
+        }
         return issueCouponToUser(userId, welcomePolicy.getCouponId());
     }
 
     @Transactional
-    public UserCoupon issueBirthdayCoupon(Long userId, int birthMonth) {
+    public UserCoupon issueBirthdayCoupon(String userId, int birthMonth) {
         CouponPolicy birthdayPolicy = couponPolicyRepository.findByCouponName("Birthday Coupon")
                 .orElseThrow(() -> new CouponNotFoundException("Birthday 쿠폰 정책을 찾을 수 없습니다."));
 
@@ -152,7 +156,7 @@ public class CouponService {
     }
 
     @Transactional
-    public void useCoupon(Long userId, Long userCouponId) {
+    public void useCoupon(String userId, Long userCouponId) {
         UserCoupon userCoupon = userCouponRepository.findByUserIdAndUserCouponId(userId, userCouponId)
                 .orElseThrow(() -> new UserCouponNotFoundException("쿠폰을 찾을 수 없습니다. UserCoupon ID: " + userCouponId + " 또는 사용자 ID: " + userId + "와 일치하지 않습니다."));
 
@@ -167,7 +171,7 @@ public class CouponService {
         userCouponRepository.save(userCoupon);
     }
 
-    public Integer calculateDiscountAmount(Long userId, Long userCouponId, int orderAmount, List<Long> bookIdsInOrder, List<Long> categoryIdsInOrder) { // userId는 Long
+    public Integer calculateDiscountAmount(String userId, Long userCouponId, int orderAmount, List<Long> bookIdsInOrder, List<Long> categoryIdsInOrder) { // userId는 Long
         UserCoupon userCoupon = userCouponRepository.findByUserIdAndUserCouponId(userId, userCouponId)
                 .orElseThrow(() -> new UserCouponNotFoundException("쿠폰을 찾을 수 없습니다. UserCoupon ID: " + userCouponId + " 또는 사용자 ID: " + userId + "와 일치하지 않습니다."));
 

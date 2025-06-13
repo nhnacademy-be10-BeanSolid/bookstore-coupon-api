@@ -8,9 +8,9 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.Optional;
 
-public interface UsersRepository extends JpaRepository<Users, Long> {
+public interface UsersRepository extends JpaRepository<Users, String> {
     @Query("SELECT u.userId FROM Users u WHERE MONTH(u.userBirth) = :month")
-    List<Long> findUserIdsByBirthMonth(@Param("month") int month);
+    List<String> findUserIdsByBirthMonth(@Param("month") int month);
 
-    Optional<Users> findByUserId(Long userId);
+    Optional<Users> findByUserId(String userId);
 }
