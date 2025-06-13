@@ -51,3 +51,4 @@ public class ExceptionThrowingController {
     public void throwMethodArgumentNotValidException(@Valid @RequestBody TestValidationDto dto) {
     }
 }
+
