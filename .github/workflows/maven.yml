@@ -5,7 +5,6 @@
 # They are provided by a third-party and are governed by
 # separate terms of service, privacy policy, and support
 # documentation.
-
 name: Coupon API CI with Maven # ** 변경: 워크플로우 이름 명확히 변경 **
 
 on:
