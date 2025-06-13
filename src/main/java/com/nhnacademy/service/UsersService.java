@@ -8,5 +8,5 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 public interface UsersService {
-    List<Long> getUserIdsByBirthMonth(int month);
+    List<String> getUserIdsByBirthMonth(int month);
 }

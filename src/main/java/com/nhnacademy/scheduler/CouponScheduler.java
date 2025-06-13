@@ -24,14 +24,14 @@ public class CouponScheduler {
         log.info("생일 쿠폰 발급 스케줄러 시작: {}", LocalDateTime.now());
 
         int currentMonth = LocalDate.now().getMonthValue();
-        List<Long> birthdayUserIds = usersService.getUserIdsByBirthMonth(currentMonth);
+        List<String> birthdayUserIds = usersService.getUserIdsByBirthMonth(currentMonth);
 
         if (birthdayUserIds.isEmpty()) {
             log.info("이번 달 생일인 사용자가 없습니다.");
             return;
         }
 
-        for (Long userId : birthdayUserIds) {
+        for (String userId : birthdayUserIds) {
             try {
                 couponService.issueBirthdayCoupon(userId, currentMonth);
                 log.info("사용자 ID {} 에게 생일 쿠폰이 성공적으로 발급되었습니다.", userId);

@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @Builder
 public class UserCouponResponse {
     private Long userCouponId;
-    private Long userId;
+    private String userId;
     private Long couponPolicyId;
     private String couponName;
     private LocalDateTime issuedAt;

@@ -15,7 +15,7 @@ public class UsersServiceImpl implements UsersService {
     private final UsersRepository usersRepository;
 
     @Override
-    public List<Long> getUserIdsByBirthMonth(int month) {
+    public List<String> getUserIdsByBirthMonth(int month) {
         return usersRepository.findUserIdsByBirthMonth(month);
     }
 }

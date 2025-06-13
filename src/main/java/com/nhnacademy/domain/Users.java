@@ -13,7 +13,7 @@ import java.time.LocalDate;
 public class Users {
     @Id
     @Column(name = "user_id")
-    private Long userId;
+    private String userId;
 
     @Column(name = "user_birth")
     private LocalDate userBirth;
