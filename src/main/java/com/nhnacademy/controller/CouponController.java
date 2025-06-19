@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -65,7 +66,7 @@ public class CouponController {
 
     @PostMapping("/users/{userId}/issue-birthday")
     public ResponseEntity<UserCouponResponse> issueBirthdayCoupon(@PathVariable String userId,
-                                                                  @RequestParam int birthMonth) {
+                                                                  @RequestParam LocalDate birthMonth) {
         UserCoupon birthdayCoupon = couponService.issueBirthdayCoupon(userId, birthMonth);
         return new ResponseEntity<>(UserCouponResponse.from(birthdayCoupon), HttpStatus.CREATED);
     }

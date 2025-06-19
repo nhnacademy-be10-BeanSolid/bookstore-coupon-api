@@ -21,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
@@ -123,13 +124,14 @@ public class CouponService {
         List<UserCoupon> existingWelcomeCoupons = userCouponRepository.findByUserIdAndCouponPolicy(userId, welcomePolicy);
 
         if (!existingWelcomeCoupons.isEmpty()) {
-            throw new IllegalStateException(String.format("사용자 ID: %d에게 웰컴 쿠폰이 이미 발급되었습니다.", userId));
+            // userId는 String이므로 %s를 사용합니다.
+            throw new IllegalStateException(String.format("사용자 ID: %s에게 웰컴 쿠폰이 이미 발급되었습니다.", userId));
         }
         return issueCouponToUser(userId, welcomePolicy.getCouponId());
     }
 
     @Transactional
-    public UserCoupon issueBirthdayCoupon(String userId, int birthMonth) {
+    public UserCoupon issueBirthdayCoupon(String userId, LocalDate userBirth) { // 'birthMonth'를 'userBirth'로 변경
         CouponPolicy birthdayPolicy = couponPolicyRepository.findByCouponName("Birthday Coupon")
                 .orElseThrow(() -> new CouponNotFoundException("Birthday 쿠폰 정책을 찾을 수 없습니다."));
 
@@ -138,9 +140,12 @@ public class CouponService {
                 .anyMatch(uc -> uc.getIssuedAt().getYear() == LocalDateTime.now().getYear());
 
         if (alreadyIssuedThisYear) {
-            throw new IllegalStateException(String.format("사용자 ID: %d에게 이번 연도 생일 쿠폰이 이미 발급되었습니다.", userId));
+            // userId는 String이므로 %s를 사용합니다.
+            throw new IllegalStateException(String.format("사용자 ID: %s에게 이번 연도 생일 쿠폰이 이미 발급되었습니다.", userId));
         }
 
+        // 전달받은 userBirth에서 월 정보를 추출하여 사용합니다.
+        int birthMonth = userBirth.getMonthValue();
         LocalDateTime firstDayOfMonth = LocalDateTime.now().withMonth(birthMonth).withDayOfMonth(1).toLocalDate().atStartOfDay();
         LocalDateTime lastDayOfMonth = firstDayOfMonth.with(TemporalAdjusters.lastDayOfMonth()).toLocalDate().atTime(23, 59, 59);
 
@@ -171,7 +176,8 @@ public class CouponService {
         userCouponRepository.save(userCoupon);
     }
 
-    public Integer calculateDiscountAmount(String userId, Long userCouponId, int orderAmount, List<Long> bookIdsInOrder, List<Long> categoryIdsInOrder) { // userId는 Long
+    public Integer calculateDiscountAmount(String userId, Long userCouponId, int orderAmount, List<Long> bookIdsInOrder, List<Long> categoryIdsInOrder) {
+        // 주석: userId는 String 타입입니다.
         UserCoupon userCoupon = userCouponRepository.findByUserIdAndUserCouponId(userId, userCouponId)
                 .orElseThrow(() -> new UserCouponNotFoundException("쿠폰을 찾을 수 없습니다. UserCoupon ID: " + userCouponId + " 또는 사용자 ID: " + userId + "와 일치하지 않습니다."));
 
