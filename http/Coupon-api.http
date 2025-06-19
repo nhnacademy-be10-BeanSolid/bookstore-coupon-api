@@ -20,16 +20,16 @@ POST http://localhost:8080/coupons/policy
 Content-Type: application/json
 
 {
-"couponName": "2만원 이상 구매 시 3천원 할인",
-"couponDiscountType": "AMOUNT",
-"couponDiscountAmount": 3000,
-"couponMinimumOrderAmount": 20000,
-"couponMaximumDiscountAmount": null,
-"couponScope": "ALL",
-"couponExpiredAt": "2025-12-31T23:59:59",
-"couponIssuePeriod": null,
-"bookIds": [],
-"categoryIds": []
+  "couponName": "2만원 이상 구매 시 3천원 할인",
+  "couponDiscountType": "AMOUNT",
+  "couponDiscountAmount": 3000,
+  "couponMinimumOrderAmount": 20000,
+  "couponMaximumDiscountAmount": null,
+  "couponScope": "ALL",
+  "couponExpiredAt": "2025-12-31T23:59:59",
+  "couponIssuePeriod": null,
+  "bookIds": [],
+  "categoryIds": []
 }
 
 ### 3번째 쿠폰 등록
@@ -119,10 +119,3 @@ Content-Type: application/json
 ### 할인 금액 계산 (특정 카테고리 포함)
 GET http://localhost:8080/coupons/users/1/calculate-discount/3?orderAmount=30000&categoryIds=101
 Content-Type: application/json
-
-
-
-
-
-
-
