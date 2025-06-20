@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-
 @DisplayName("쿠폰 관련 예외 클래스 테스트")
 public class CouponExceptionTests {
 
@@ -99,7 +98,7 @@ public class CouponExceptionTests {
 
     @Nested
     @DisplayName("UserCouponNotFoundException 테스트")
-        public class UserCouponNotFoundExceptionTest {
+        public class UsedCouponNotFoundExceptionTest {
         @Test
         @DisplayName("생성자 호출 및 메시지 확인")
         public void testCreationAndMessage() {
