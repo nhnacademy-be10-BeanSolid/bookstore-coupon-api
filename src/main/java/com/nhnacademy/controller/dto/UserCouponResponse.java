@@ -1,6 +1,6 @@
 package com.nhnacademy.controller.dto;
 
-import com.nhnacademy.domain.UserCoupon;
+import com.nhnacademy.domain.UsedCoupon;
 import com.nhnacademy.domain.UserCouponStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,17 +22,19 @@ public class UserCouponResponse {
     private LocalDateTime expiredAt;
     private LocalDateTime usedAt;
     private UserCouponStatus status;
+    private Long orderId;
 
-    public static UserCouponResponse from(UserCoupon userCoupon) {
+    public static UserCouponResponse from(UsedCoupon usedCoupon) {
         return UserCouponResponse.builder()
-                .userCouponId(userCoupon.getUserCouponId())
-                .userId(userCoupon.getUserId())
-                .couponPolicyId(userCoupon.getCouponPolicy().getCouponId())
-                .couponName(userCoupon.getCouponPolicy().getCouponName())
-                .issuedAt(userCoupon.getIssuedAt())
-                .expiredAt(userCoupon.getExpiredAt())
-                .usedAt(userCoupon.getUsedAt())
-                .status(userCoupon.getStatus())
+                .userCouponId(usedCoupon.getUserCouponId())
+                .userId(usedCoupon.getUserId())
+                .couponPolicyId(usedCoupon.getCouponPolicy().getCouponId())
+                .couponName(usedCoupon.getCouponPolicy().getCouponName())
+                .issuedAt(usedCoupon.getIssuedAt())
+                .expiredAt(usedCoupon.getExpiredAt())
+                .usedAt(usedCoupon.getUsedAt())
+                .status(usedCoupon.getStatus())
+                .orderId(usedCoupon.getOrderId())
                 .build();
     }
 }
