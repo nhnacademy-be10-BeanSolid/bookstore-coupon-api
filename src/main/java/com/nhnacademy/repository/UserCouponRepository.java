@@ -1,20 +1,20 @@
 package com.nhnacademy.repository;
 
 import com.nhnacademy.domain.CouponPolicy;
-import com.nhnacademy.domain.UserCoupon;
+import com.nhnacademy.domain.UsedCoupon;
 import com.nhnacademy.domain.UserCouponStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-public interface UserCouponRepository extends JpaRepository<UserCoupon, Long> {
+public interface UserCouponRepository extends JpaRepository<UsedCoupon, Long> {
 
-    List<UserCoupon> findByUserId(String userId);
+    List<UsedCoupon> findByUserId(String userId);
 
-    List<UserCoupon> findByStatusAndExpiredAtBefore(UserCouponStatus status, LocalDateTime dateTime);
+    List<UsedCoupon> findByStatusAndExpiredAtBefore(UserCouponStatus status, LocalDateTime dateTime);
 
-    List<UserCoupon> findByUserIdAndCouponPolicy(String userId, CouponPolicy couponPolicy);
+    List<UsedCoupon> findByUserIdAndCouponPolicy(String userId, CouponPolicy couponPolicy);
 
-    Optional<UserCoupon> findByUserIdAndUserCouponId(String userId, Long userCouponId);
+    Optional<UsedCoupon> findByUserIdAndUserCouponId(String userId, Long userCouponId);
 }
