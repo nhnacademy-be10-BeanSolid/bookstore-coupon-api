@@ -5,12 +5,13 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "user_coupon")
+@Table(name = "used_coupon")
 @Getter
+@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class UserCoupon {
+public class UsedCoupon {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_coupon_id")
@@ -18,6 +19,9 @@ public class UserCoupon {
 
     @Column(name = "user_id", nullable = false)
     private String userId;
+
+    @Column(name = "id", nullable = true)
+    private Long orderId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "coupon_id", nullable = false)
@@ -37,7 +41,11 @@ public class UserCoupon {
     private UserCouponStatus status;
 
     public void use() {
-        this.status = UserCouponStatus.USED;
-        this.usedAt = LocalDateTime.now();
+        if (this.status == UserCouponStatus.ACTIVE && this.expiredAt.isAfter(LocalDateTime.now())) {
+            this.status = UserCouponStatus.USED;
+            this.usedAt = LocalDateTime.now();
+        } else {
+            throw new IllegalStateException("쿠폰을 사용할 수 없는 상태입니다 (이미 사용되었거나 만료).");
+        }
     }
 }
