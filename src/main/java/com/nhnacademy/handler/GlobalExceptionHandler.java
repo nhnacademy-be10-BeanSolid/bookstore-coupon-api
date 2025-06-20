@@ -63,6 +63,12 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<String> handleIllegalStateException(IllegalStateException ex) {
+        log.warn("비즈니스 로직 충돌/상태 오류: {}", ex.getMessage());
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.CONFLICT);
+    }
+
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<String> handleAllRuntimeExceptions(RuntimeException e) {
         log.error("예상치 못한 오류 발생: {}", e.getMessage(), e);
