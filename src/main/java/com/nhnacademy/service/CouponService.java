@@ -108,8 +108,16 @@ public class CouponService {
         return userCouponRepository.save(usedCoupon);
     }
 
-    public List<UsedCoupon> getUserCoupons(String userId) {
-        return userCouponRepository.findByUserId(userId);
+    public List<UsedCoupon> getActiveUserCoupons(String userId) {
+        return userCouponRepository.findActiveCouponsByUserIdAndPeriod(userId, LocalDateTime.now().minusYears(100), LocalDateTime.now().plusYears(100));
+    }
+
+    public List<UsedCoupon> getUsedUserCoupons(String userId) {
+        return userCouponRepository.findUsedCouponsByUserId(userId);
+    }
+
+    public List<UsedCoupon> getExpiredUserCoupons(String userId) {
+        return userCouponRepository.findExpiredCouponsByUserId(userId);
     }
 
     public CouponPolicy getCouponPolicy(Long policyId) {
@@ -119,7 +127,7 @@ public class CouponService {
 
     @Transactional
     public UsedCoupon issueWelcomeCoupon(String userId) {
-        CouponPolicy welcomePolicy = couponPolicyRepository.findByCouponName("Welcome Coupon")
+        CouponPolicy welcomePolicy = couponPolicyRepository.findByName("Welcome Coupon")
                 .orElseThrow(() -> new WelcomeCouponPolicyNotFoundException("Welcome 쿠폰 정책을 찾을 수 없습니다."));
         List<UsedCoupon> existingWelcomeCoupons = userCouponRepository.findByUserIdAndCouponPolicy(userId, welcomePolicy);
 
@@ -131,7 +139,7 @@ public class CouponService {
 
     @Transactional
     public UsedCoupon issueBirthdayCoupon(String userId, LocalDate userBirth) {
-        CouponPolicy birthdayPolicy = couponPolicyRepository.findByCouponName("Birthday Coupon")
+        CouponPolicy birthdayPolicy = couponPolicyRepository.findByName("Birthday Coupon")
                 .orElseThrow(() -> new CouponNotFoundException("Birthday 쿠폰 정책을 찾을 수 없습니다."));
 
         boolean alreadyIssuedThisYear = userCouponRepository.findByUserIdAndCouponPolicy(userId, birthdayPolicy)
@@ -198,17 +206,13 @@ public class CouponService {
         }
 
         if (policy.getCouponScope() == CouponScope.BOOK) {
-            List<Long> applicableBookIds = couponBookRepository.findByCouponId(policy.getCouponId())
-                    .stream().map(CouponBook::getBookId).collect(Collectors.toList());
-
-            if (bookIdsInOrder == null || bookIdsInOrder.isEmpty() || !bookIdsInOrder.stream().anyMatch(applicableBookIds::contains)) {
+            boolean isApplicable = couponBookRepository.existsByCouponPolicyIdAndBookIdsIn(policy.getCouponId(), bookIdsInOrder);
+            if (!isApplicable) {
                 throw new CouponNotApplicableException("주문에 쿠폰 적용 대상 도서가 포함되어 있지 않습니다.");
             }
         } else if (policy.getCouponScope() == CouponScope.CATEGORY) {
-            List<Long> applicableCategoryIds = couponCategoryRepository.findByCouponId(policy.getCouponId())
-                    .stream().map(CouponCategory::getCategoryId).collect(Collectors.toList());
-
-            if (categoryIdsInOrder == null || categoryIdsInOrder.isEmpty() || !categoryIdsInOrder.stream().anyMatch(applicableCategoryIds::contains)) {
+            boolean isApplicable = couponCategoryRepository.existsByCouponPolicyIdAndCategoryIdsIn(policy.getCouponId(), categoryIdsInOrder);
+            if (!isApplicable) {
                 throw new CouponNotApplicableException("주문에 쿠폰 적용 대상 카테고리가 포함되어 있지 않습니다.");
             }
         }
