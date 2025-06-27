@@ -1,5 +1,5 @@
 ### 쿠폰 등록
-POST http://localhost:8080/coupons/policy
+POST http://localhost:10352/coupons/policy
 Content-Type: application/json
 
 {
@@ -16,7 +16,7 @@ Content-Type: application/json
 }
 
 ### 2번째 쿠폰 등록
-POST http://localhost:8080/coupons/policy
+POST http://localhost:10352/coupons/policy
 Content-Type: application/json
 
 {
@@ -33,15 +33,15 @@ Content-Type: application/json
 }
 
 ### 3번째 쿠폰 등록
-POST http://localhost:8080/coupons/policy
+POST http://localhost:10352/coupons/policy
 Content-Type: application/json
 
 {
   "couponName": "가입 축하 1만원 할인 쿠폰",
-  "couponDiscountType": "FIXED",
+  "couponDiscountType": "AMOUNT",
   "couponDiscountAmount": 10000,
   "couponMinimumOrderAmount": 50000,
-  "couponMaximumDiscountAmount": 0,
+  "couponMaximumDiscountAmount": null,
   "couponScope": "ALL",
   "couponExpiredAt": "2025-12-31T23:59:59",
   "couponIssuePeriod": 30,
@@ -49,8 +49,43 @@ Content-Type: application/json
   "categoryIds": []
 }
 
+### 도서 부분 쿠폰 등록
+POST http://localhost:10352/coupons/policy
+Content-Type: application/json
+
+{
+  "couponName": "특정 도서 5천원 할인",
+  "couponDiscountType": "AMOUNT",
+  "couponDiscountAmount": 5000,
+  "couponMinimumOrderAmount": 15000,
+  "couponMaximumDiscountAmount": null,
+  "couponScope": "BOOK",
+  "couponExpiredAt": "2025-12-31T23:59:59",
+  "couponIssuePeriod": null,
+  "bookIds": [10, 25, 30],
+  "categoryIds": []
+}
+
+### 카테고리 부분 쿠폰 등록
+POST http://localhost:10352/coupons/policy
+Content-Type: application/json
+
+{
+  "couponName": "특정 도서 5천원 할인",
+  "couponDiscountType": "AMOUNT",
+  "couponDiscountAmount": 5000,
+  "couponMinimumOrderAmount": 15000,
+  "couponMaximumDiscountAmount": null,
+  "couponScope": "CATEGORY",
+  "couponExpiredAt": "2025-12-31T23:59:59",
+  "couponIssuePeriod": null,
+  "bookIds": [],
+  "categoryIds": [1, 2, 3]
+}
+
+
 ### 생일 쿠폰 등록
-POST http://localhost:8080/coupons/policy
+POST http://localhost:10352/coupons/policy
 Content-Type: application/json
 
 {
@@ -67,7 +102,7 @@ Content-Type: application/json
 }
 
 ### 웰컴 쿠폰 정책 등록
-POST http://localhost:8080/coupons/policy
+POST http://localhost:10352/coupons/policy
 Content-Type: application/json
 
 {
@@ -84,38 +119,50 @@ Content-Type: application/json
 }
 
 ### 사용자에게 쿠폰 발급
-POST http://localhost:8080/coupons/users/1/issue/1
+POST http://localhost:10352/coupons/users/11/issue/1
 Content-Type: application/json
 
 ### 사용자에게 생일 쿠폰 발급
-POST http://localhost:8080/coupons/users/1/issue-birthday?birthMonth=6
+POST http://localhost:10352/coupons/users/7/issue-birthday?birthMonth=4
 Content-Type: application/json
 
 ### 사용자에게 웰컴 쿠폰 발급
-POST http://localhost:8080/coupons/users/1/issue-welcome
+POST http://localhost:10352/coupons/users/9/issue-welcome
 Content-Type: application/json
 
 
 ### 쿠폰 정책 상세 조회
-GET http://localhost:8080/coupons/policy/3
+GET http://localhost:10352/coupons/policy/1
 Content-Type: application/json
 
-### 사용자 보유 쿠폰 조회
-GET http://localhost:8080/coupons/users/1
+
+### 사용자 활성 쿠폰 조회
+GET http://localhost:10352/coupons/users/1/active
 Content-Type: application/json
+
+
+### 사용자 사용된 쿠폰 조회
+GET http://localhost:10352/coupons/users/1/used
+Content-Type: application/json
+
 
 ### 사용자 쿠폰 사용
-POST http://localhost:8080/coupons/users/1/use/2
+POST http://localhost:10352/coupons/users/1/use/4
 Content-Type: application/json
 
+{
+  "orderId": 25623
+}
+
+
 ### 할인 금액 계산 (기본)
-GET http://localhost:8080/coupons/users/1/calculate-discount/3?orderAmount=50000
+GET http://localhost:10352/coupons/users/1/calculate-discount/3?orderAmount=50000
 Content-Type: application/json
 
 ### 할인 금액 계산 (특정 도서 포함)
-GET http://localhost:8080/coupons/users/1/calculate-discount/2?orderAmount=30000&bookIds=10
+GET http://localhost:10352/coupons/users/1/calculate-discount/3?orderAmount=30000&bookIds=10
 Content-Type: application/json
 
 ### 할인 금액 계산 (특정 카테고리 포함)
-GET http://localhost:8080/coupons/users/1/calculate-discount/3?orderAmount=30000&categoryIds=101
+GET http://localhost:10352/coupons/users/1/calculate-discount/3?orderAmount=30000&categoryIds=101
 Content-Type: application/json
