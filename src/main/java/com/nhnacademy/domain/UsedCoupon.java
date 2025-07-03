@@ -17,7 +17,7 @@ public class UsedCoupon {
     @Column(name = "user_coupon_id")   // 사용 된 쿠폰
     private Long userCouponId;
 
-    @Column(name = "user_id", nullable = false) // 회원 식별
+    @Column(name = "user_no", nullable = false) // 회원 식별
     private String userId;
 
     @Column(name = "order_id", nullable = true) // 주문 ID

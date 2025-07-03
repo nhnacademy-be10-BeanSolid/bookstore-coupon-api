@@ -15,7 +15,6 @@ import jakarta.validation.Valid;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/coupons")
@@ -78,7 +77,7 @@ public class CouponController {
         List<UsedCoupon> activeCoupons = couponService.getActiveUserCoupons(userId);
         List<UserCouponResponse> responses = activeCoupons.stream()
                 .map(UserCouponResponse::from)
-                .collect(Collectors.toList());
+                .toList();
         return new ResponseEntity<>(responses, HttpStatus.OK);
     }
 
@@ -87,7 +86,7 @@ public class CouponController {
         List<UsedCoupon> usedCoupons = couponService.getUsedUserCoupons(userId);
         List<UserCouponResponse> responses = usedCoupons.stream()
                 .map(UserCouponResponse::from)
-                .collect(Collectors.toList());
+                .toList();
         return new ResponseEntity<>(responses, HttpStatus.OK);
     }
 

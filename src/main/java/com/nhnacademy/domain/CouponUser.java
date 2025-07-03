@@ -28,5 +28,4 @@ public class CouponUser implements Serializable {
     @MapsId("couponId")
     @JoinColumn(name = "coupon_id", insertable = false, updatable = false)
     private CouponPolicy couponPolicy;
-
 }
