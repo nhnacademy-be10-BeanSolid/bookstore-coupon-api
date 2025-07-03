@@ -73,9 +73,18 @@ public class CouponController {
         return new ResponseEntity<>(UserCouponResponse.from(birthdayCoupon), HttpStatus.CREATED);
     }
 
-    @GetMapping("/users/{userId}")
-    public ResponseEntity<List<UserCouponResponse>> getUserCoupons(@PathVariable String userId) {
-        List<UsedCoupon> usedCoupons = couponService.getUserCoupons(userId);
+    @GetMapping("/users/{userId}/active")
+    public ResponseEntity<List<UserCouponResponse>> getActiveUserCoupons(@PathVariable String userId) {
+        List<UsedCoupon> activeCoupons = couponService.getActiveUserCoupons(userId);
+        List<UserCouponResponse> responses = activeCoupons.stream()
+                .map(UserCouponResponse::from)
+                .collect(Collectors.toList());
+        return new ResponseEntity<>(responses, HttpStatus.OK);
+    }
+
+    @GetMapping("/users/{userId}/used")
+    public ResponseEntity<List<UserCouponResponse>> getUsedUserCoupons(@PathVariable String userId) {
+        List<UsedCoupon> usedCoupons = couponService.getUsedUserCoupons(userId);
         List<UserCouponResponse> responses = usedCoupons.stream()
                 .map(UserCouponResponse::from)
                 .collect(Collectors.toList());

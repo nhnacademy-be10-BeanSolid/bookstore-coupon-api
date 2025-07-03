@@ -14,30 +14,30 @@ import java.time.LocalDateTime;
 public class UsedCoupon {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_coupon_id")
+    @Column(name = "user_coupon_id")   // 사용 된 쿠폰
     private Long userCouponId;
 
-    @Column(name = "user_id", nullable = false)
+    @Column(name = "user_id", nullable = false) // 회원 식별
     private String userId;
 
-    @Column(name = "id", nullable = true)
+    @Column(name = "order_id", nullable = true) // 주문 ID
     private Long orderId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "coupon_id", nullable = false)
+    @JoinColumn(name = "coupon_id", nullable = false)   // 쿠폰 식별
     private CouponPolicy couponPolicy;
 
-    @Column(name = "issued_at", nullable = false)
+    @Column(name = "issued_at", nullable = false)    // 쿠폰 발급
     private LocalDateTime issuedAt;
 
-    @Column(name = "expired_at", nullable = false)
+    @Column(name = "expired_at", nullable = false)    // 쿠폰 만료
     private LocalDateTime expiredAt;
 
-    @Column(name = "used_at")
+    @Column(name = "used_at")       // 사용 시간
     private LocalDateTime usedAt;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false, length = 20)
+    @Column(name = "status", nullable = false, length = 20)   // 상태
     private UserCouponStatus status;
 
     public void use() {
