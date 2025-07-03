@@ -3,8 +3,6 @@ package com.nhnacademy.domain;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.io.Serializable;
-
 @Entity
 @Table(name = "coupon_user")
 @Getter
@@ -12,10 +10,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @IdClass(CouponUser.class)
 @Builder
-@EqualsAndHashCode
-public class CouponUser implements Serializable {
-    private static final long serialVersionUID = 1L;
-
+public class CouponUser {
     @Id
     @Column(name = "coupon_id")
     private Long couponId;
@@ -28,5 +23,4 @@ public class CouponUser implements Serializable {
     @MapsId("couponId")
     @JoinColumn(name = "coupon_id", insertable = false, updatable = false)
     private CouponPolicy couponPolicy;
-
 }
