@@ -36,7 +36,7 @@ public class CouponPolicyRepositoryImpl implements CouponPolicyRepositoryCustom 
                 .fetchOne());
     }
     @Override
-    public List<CouponPolicy> findApplicableCouponPolicies(String userId, int orderAmount, List<Long> bookIdsInOrder, List<Long> categoryIdsInOrder) {
+    public List<CouponPolicy> findApplicableCouponPolicies(String userNo, int orderAmount, List<Long> bookIdsInOrder, List<Long> categoryIdsInOrder) {
         QCouponPolicy policy = QCouponPolicy.couponPolicy;
         QUsedCoupon usedCoupon = QUsedCoupon.usedCoupon;
 
@@ -67,7 +67,7 @@ public class CouponPolicyRepositoryImpl implements CouponPolicyRepositoryCustom 
                 .select(policy)
                 .from(policy)
                 .join(usedCoupon).on(usedCoupon.couponPolicy.eq(policy))
-                .where(usedCoupon.userId.eq(userId)
+                .where(usedCoupon.userNo.eq(userNo)
                         .and(usedCoupon.status.eq(UserCouponStatus.ACTIVE))
                         .and(usedCoupon.expiredAt.after(LocalDateTime.now()))
                         .and(commonConditions)

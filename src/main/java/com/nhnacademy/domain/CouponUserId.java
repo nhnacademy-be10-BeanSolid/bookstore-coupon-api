@@ -8,5 +8,5 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class CouponUserId implements Serializable {
     private Long couponId;
-    private String userId;
+    private String userNo;
 }

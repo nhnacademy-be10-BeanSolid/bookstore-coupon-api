@@ -21,8 +21,8 @@ public class CouponUser implements Serializable {
     private Long couponId;
 
     @Id
-    @Column(name = "user_id", length = 20)
-    private String userId;
+    @Column(name = "user_no", length = 20)
+    private String userNo;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("couponId")

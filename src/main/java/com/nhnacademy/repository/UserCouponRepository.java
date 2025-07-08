@@ -12,11 +12,12 @@ import java.util.Optional;
 public interface UserCouponRepository extends JpaRepository<UsedCoupon, Long>,
         QuerydslPredicateExecutor<UsedCoupon>,
         UserCouponRepositoryCustom {
-    List<UsedCoupon> findByUserId(String userId);
+
+    List<UsedCoupon> findByUserNo(String userNo);
 
     List<UsedCoupon> findByStatusAndExpiredAtBefore(UserCouponStatus status, LocalDateTime dateTime);
 
-    List<UsedCoupon> findByUserIdAndCouponPolicy(String userId, CouponPolicy couponPolicy);
+    List<UsedCoupon> findByUserNoAndCouponPolicy(String userNo, CouponPolicy couponPolicy);
 
-    Optional<UsedCoupon> findByUserIdAndUserCouponId(String userId, Long userCouponId);
+    Optional<UsedCoupon> findByUserNoAndUserCouponId(String userNo, Long userCouponId);
 }

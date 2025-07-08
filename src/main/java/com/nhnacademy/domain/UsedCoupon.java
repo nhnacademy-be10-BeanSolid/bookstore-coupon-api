@@ -17,7 +17,7 @@ public class UsedCoupon {
     private Long userCouponId;
 
     @Column(name = "user_no", nullable = false)
-    private String userId;
+    private String userNo;
 
     @Column(name = "order_id")
     private Long orderId;
@@ -40,10 +40,10 @@ public class UsedCoupon {
     private UserCouponStatus status;
 
     @Builder
-    public UsedCoupon(String userId, Long orderId, CouponPolicy couponPolicy,
+    public UsedCoupon(String userNo, Long orderId, CouponPolicy couponPolicy,
                       LocalDateTime issuedAt, LocalDateTime expiredAt,
                       LocalDateTime usedAt, UserCouponStatus status) {
-        this.userId = userId;
+        this.userNo = userNo;
         this.orderId = orderId;
         this.couponPolicy = couponPolicy;
         this.issuedAt = issuedAt;

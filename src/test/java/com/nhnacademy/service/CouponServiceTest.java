@@ -138,7 +138,7 @@ public class CouponServiceTest {
         CouponPolicy welcome = createPolicy(100L, CouponScope.ALL);
         when(couponPolicyRepository.findByName("Welcome Coupon")).thenReturn(Optional.of(welcome));
         when(couponPolicyRepository.findById(100L)).thenReturn(Optional.of(welcome));
-        when(userCouponRepository.findByUserIdAndCouponPolicy("user1", welcome)).thenReturn(List.of());
+        when(userCouponRepository.findByUserNoAndCouponPolicy("user1", welcome)).thenReturn(List.of());
         when(userCouponRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
         UsedCoupon result = couponService.issueWelcomeCoupon("user1");
@@ -149,7 +149,7 @@ public class CouponServiceTest {
     void issueWelcomeCoupon_alreadyIssued_throws() {
         CouponPolicy welcome = createPolicy(100L, CouponScope.ALL);
         when(couponPolicyRepository.findByName("Welcome Coupon")).thenReturn(Optional.of(welcome));
-        when(userCouponRepository.findByUserIdAndCouponPolicy("user1", welcome))
+        when(userCouponRepository.findByUserNoAndCouponPolicy("user1", welcome))
                 .thenReturn(List.of(mock(UsedCoupon.class)));
 
         assertThatThrownBy(() -> couponService.issueWelcomeCoupon("user1"))
@@ -160,7 +160,7 @@ public class CouponServiceTest {
     void issueBirthdayCoupon_success() {
         CouponPolicy birthday = createPolicy(200L, CouponScope.ALL);
         when(couponPolicyRepository.findByName("Birthday Coupon")).thenReturn(Optional.of(birthday));
-        when(userCouponRepository.findByUserIdAndCouponPolicy("user2", birthday)).thenReturn(List.of());
+        when(userCouponRepository.findByUserNoAndCouponPolicy("user2", birthday)).thenReturn(List.of());
         when(userCouponRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
         UsedCoupon result = couponService.issueBirthdayCoupon("user2", LocalDate.of(1995, 12, 5));
@@ -174,7 +174,7 @@ public class CouponServiceTest {
                 .issuedAt(LocalDateTime.now().withMonth(1))
                 .build();
         when(couponPolicyRepository.findByName("Birthday Coupon")).thenReturn(Optional.of(birthday));
-        when(userCouponRepository.findByUserIdAndCouponPolicy("user3", birthday)).thenReturn(List.of(prev));
+        when(userCouponRepository.findByUserNoAndCouponPolicy("user3", birthday)).thenReturn(List.of(prev));
 
         assertThatThrownBy(() -> couponService.issueBirthdayCoupon("user3", LocalDate.of(1990, 3, 3)))
                 .isInstanceOf(IllegalStateException.class);
@@ -183,7 +183,7 @@ public class CouponServiceTest {
     @Test
     void useCoupon_successful() {
         UsedCoupon coupon = UsedCoupon.builder()
-                .userId("u1")
+                .userNo("u1")
                 .couponPolicy(mock(CouponPolicy.class))
                 .orderId(null)
                 .issuedAt(LocalDateTime.now().minusDays(1))
@@ -192,7 +192,7 @@ public class CouponServiceTest {
                 .status(UserCouponStatus.ACTIVE)
                 .build();
 
-        when(userCouponRepository.findByUserIdAndUserCouponId("u1", coupon.getUserCouponId()))
+        when(userCouponRepository.findByUserNoAndUserCouponId("u1", coupon.getUserCouponId()))
                 .thenReturn(Optional.of(coupon));
 
         couponService.useCoupon("u1", coupon.getUserCouponId(), 2000L);
@@ -204,7 +204,7 @@ public class CouponServiceTest {
     @Test
     void useCoupon_alreadyUsed_throws() {
         UsedCoupon used = UsedCoupon.builder()
-                .userId("u1")
+                .userNo("u1")
                 .couponPolicy(mock(CouponPolicy.class))
                 .orderId(123L)
                 .issuedAt(LocalDateTime.now().minusDays(2))
@@ -213,7 +213,7 @@ public class CouponServiceTest {
                 .status(UserCouponStatus.USED)
                 .build();
 
-        when(userCouponRepository.findByUserIdAndUserCouponId("u1", used.getUserCouponId()))
+        when(userCouponRepository.findByUserNoAndUserCouponId("u1", used.getUserCouponId()))
                 .thenReturn(Optional.of(used));
 
         assertThatThrownBy(() -> couponService.useCoupon("u1", used.getUserCouponId(), 2000L))
@@ -231,14 +231,14 @@ public class CouponServiceTest {
                 .build();
 
         UsedCoupon coupon = UsedCoupon.builder()
-                .userId("user123")
+                .userNo("user123")
                 .couponPolicy(policy)
                 .issuedAt(LocalDateTime.now())
                 .expiredAt(LocalDateTime.now().plusDays(7))
                 .status(UserCouponStatus.ACTIVE)
                 .build();
 
-        when(userCouponRepository.findByUserIdAndUserCouponId("u1", 12L)).thenReturn(Optional.of(coupon));
+        when(userCouponRepository.findByUserNoAndUserCouponId("u1", 12L)).thenReturn(Optional.of(coupon));
 
         int discount = couponService.calculateDiscountAmount("u1", 12L, 10000, List.of(), List.of());
         assertThat(discount).isEqualTo(1000);
@@ -253,14 +253,14 @@ public class CouponServiceTest {
                 .build();
 
         UsedCoupon coupon = UsedCoupon.builder()
-                .userId("user123")
+                .userNo("user123")
                 .couponPolicy(policy)
                 .issuedAt(LocalDateTime.now())
                 .expiredAt(LocalDateTime.now().plusDays(7))
                 .status(UserCouponStatus.ACTIVE)
                 .build();
 
-        when(userCouponRepository.findByUserIdAndUserCouponId("u1", 99L)).thenReturn(Optional.of(coupon));
+        when(userCouponRepository.findByUserNoAndUserCouponId("u1", 99L)).thenReturn(Optional.of(coupon));
 
         assertThatThrownBy(() -> couponService.calculateDiscountAmount("u1", 99L, 10000, List.of(), List.of()))
                 .isInstanceOf(CouponNotApplicableException.class);
