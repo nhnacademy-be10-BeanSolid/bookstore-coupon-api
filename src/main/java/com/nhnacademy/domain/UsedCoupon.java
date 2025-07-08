@@ -16,7 +16,7 @@ public class UsedCoupon {
     @Column(name = "user_coupon_id")
     private Long userCouponId;
 
-    @Column(name = "user_no", nullable = false)
+    @Column(name = "user_no", nullable = false) // 회원 식별
     private String userNo;
 
     @Column(name = "order_id")

@@ -35,6 +35,7 @@ public class CouponPolicyRepositoryImpl implements CouponPolicyRepositoryCustom 
                 .where(couponPolicy.couponName.eq(couponName))
                 .fetchOne());
     }
+
     @Override
     public List<CouponPolicy> findApplicableCouponPolicies(String userNo, int orderAmount, List<Long> bookIdsInOrder, List<Long> categoryIdsInOrder) {
         QCouponPolicy policy = QCouponPolicy.couponPolicy;
@@ -63,6 +64,7 @@ public class CouponPolicyRepositoryImpl implements CouponPolicyRepositoryCustom 
                                     .exists())
             );
         }
+
         return queryFactory
                 .select(policy)
                 .from(policy)

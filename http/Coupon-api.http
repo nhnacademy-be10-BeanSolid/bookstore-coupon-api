@@ -131,9 +131,6 @@ POST http://localhost:10352/coupons/users/9/issue-welcome
 Content-Type: application/json
 
 
-### 쿠폰 정책 상세 조회
-GET http://localhost:10352/coupons/policy/1
-Content-Type: application/json
 
 
 ### 사용자 활성 쿠폰 조회
