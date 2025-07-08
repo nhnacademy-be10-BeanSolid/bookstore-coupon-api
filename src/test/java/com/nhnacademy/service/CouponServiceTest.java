@@ -183,29 +183,43 @@ public class CouponServiceTest {
     @Test
     void useCoupon_successful() {
         UsedCoupon coupon = UsedCoupon.builder()
-                .userCouponId(10L)
                 .userId("u1")
-                .status(UserCouponStatus.ACTIVE)
+                .couponPolicy(mock(CouponPolicy.class))
+                .orderId(null)
+                .issuedAt(LocalDateTime.now().minusDays(1))
                 .expiredAt(LocalDateTime.now().plusDays(1))
+                .usedAt(null)
+                .status(UserCouponStatus.ACTIVE)
                 .build();
-        when(userCouponRepository.findByUserIdAndUserCouponId("u1", 10L)).thenReturn(Optional.of(coupon));
 
-        couponService.useCoupon("u1", 10L, 2000L);
+        when(userCouponRepository.findByUserIdAndUserCouponId("u1", coupon.getUserCouponId()))
+                .thenReturn(Optional.of(coupon));
+
+        couponService.useCoupon("u1", coupon.getUserCouponId(), 2000L);
+
         assertThat(coupon.getStatus()).isEqualTo(UserCouponStatus.USED);
     }
+
 
     @Test
     void useCoupon_alreadyUsed_throws() {
         UsedCoupon used = UsedCoupon.builder()
-                .userCouponId(11L)
                 .userId("u1")
+                .couponPolicy(mock(CouponPolicy.class))
+                .orderId(123L)
+                .issuedAt(LocalDateTime.now().minusDays(2))
+                .expiredAt(LocalDateTime.now().plusDays(1))
+                .usedAt(LocalDateTime.now().minusDays(1))
                 .status(UserCouponStatus.USED)
                 .build();
-        when(userCouponRepository.findByUserIdAndUserCouponId("u1", 11L)).thenReturn(Optional.of(used));
 
-        assertThatThrownBy(() -> couponService.useCoupon("u1", 11L, 2000L))
+        when(userCouponRepository.findByUserIdAndUserCouponId("u1", used.getUserCouponId()))
+                .thenReturn(Optional.of(used));
+
+        assertThatThrownBy(() -> couponService.useCoupon("u1", used.getUserCouponId(), 2000L))
                 .isInstanceOf(CouponAlreadyUsedException.class);
     }
+
 
     @Test
     void calculateDiscountAmount_percentSuccess() {
@@ -217,11 +231,11 @@ public class CouponServiceTest {
                 .build();
 
         UsedCoupon coupon = UsedCoupon.builder()
+                .userId("user123")
                 .couponPolicy(policy)
-                .userCouponId(12L)
-                .userId("u1")
+                .issuedAt(LocalDateTime.now())
+                .expiredAt(LocalDateTime.now().plusDays(7))
                 .status(UserCouponStatus.ACTIVE)
-                .expiredAt(LocalDateTime.now().plusDays(1))
                 .build();
 
         when(userCouponRepository.findByUserIdAndUserCouponId("u1", 12L)).thenReturn(Optional.of(coupon));
@@ -239,11 +253,11 @@ public class CouponServiceTest {
                 .build();
 
         UsedCoupon coupon = UsedCoupon.builder()
+                .userId("user123")
                 .couponPolicy(policy)
-                .userCouponId(99L)
-                .userId("u1")
+                .issuedAt(LocalDateTime.now())
+                .expiredAt(LocalDateTime.now().plusDays(7))
                 .status(UserCouponStatus.ACTIVE)
-                .expiredAt(LocalDateTime.now().plusDays(1))
                 .build();
 
         when(userCouponRepository.findByUserIdAndUserCouponId("u1", 99L)).thenReturn(Optional.of(coupon));
