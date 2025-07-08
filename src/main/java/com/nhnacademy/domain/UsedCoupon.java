@@ -4,41 +4,53 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "used_coupon")
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
-@Builder
+@Entity
+@Table(name = "used_coupon")
 public class UsedCoupon {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_coupon_id")   // 사용 된 쿠폰
+    @Column(name = "user_coupon_id")
     private Long userCouponId;
 
-    @Column(name = "user_no", nullable = false) // 회원 식별
+    @Column(name = "user_no", nullable = false)
     private String userId;
 
-    @Column(name = "order_id", nullable = true) // 주문 ID
+    @Column(name = "order_id")
     private Long orderId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "coupon_id", nullable = false)   // 쿠폰 식별
+    @JoinColumn(name = "coupon_id", nullable = false)
     private CouponPolicy couponPolicy;
 
-    @Column(name = "issued_at", nullable = false)    // 쿠폰 발급
+    @Column(name = "issued_at", nullable = false)
     private LocalDateTime issuedAt;
 
-    @Column(name = "expired_at", nullable = false)    // 쿠폰 만료
+    @Column(name = "expired_at", nullable = false)
     private LocalDateTime expiredAt;
 
-    @Column(name = "used_at")       // 사용 시간
+    @Column(name = "used_at")
     private LocalDateTime usedAt;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false, length = 20)   // 상태
+    @Column(name = "status", nullable = false, length = 20)
     private UserCouponStatus status;
+
+    @Builder
+    public UsedCoupon(String userId, Long orderId, CouponPolicy couponPolicy,
+                      LocalDateTime issuedAt, LocalDateTime expiredAt,
+                      LocalDateTime usedAt, UserCouponStatus status) {
+        this.userId = userId;
+        this.orderId = orderId;
+        this.couponPolicy = couponPolicy;
+        this.issuedAt = issuedAt;
+        this.expiredAt = expiredAt;
+        this.usedAt = usedAt;
+        this.status = status;
+    }
 
     public void use() {
         if (this.status == UserCouponStatus.ACTIVE && this.expiredAt.isAfter(LocalDateTime.now())) {
