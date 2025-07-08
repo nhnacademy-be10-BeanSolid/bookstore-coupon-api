@@ -26,6 +26,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -45,7 +46,7 @@ public class CouponService {
         CouponPolicy policy = CouponPolicy.builder()
                 .couponName(name)
                 .couponDiscountType(discountType)
-                .couponDiscountAmount(Integer.valueOf(discountAmount))
+                .couponDiscountAmount(discountAmount)
                 .couponMinimumOrderAmount(minOrderAmount)
                 .couponMaximumDiscountAmount(maxDiscountAmount)
                 .couponScope(scope)
@@ -186,7 +187,7 @@ public class CouponService {
         userCouponRepository.save(usedCoupon);
     }
 
-    public int calculateDiscountAmount(String userNo, Long userCouponId, int orderAmount, List<Long> bookIdsInOrder, List<Long> categoryIdsInOrder) {
+    public Integer calculateDiscountAmount(String userNo, Long userCouponId, int orderAmount, List<Long> bookIdsInOrder, List<Long> categoryIdsInOrder) {
         UsedCoupon usedCoupon = userCouponRepository.findByUserNoAndUserCouponId(userNo, userCouponId)
                 .orElseThrow(() -> new UserCouponNotFoundException("쿠폰을 찾을 수 없습니다. UserCoupon ID: " + userCouponId + " 또는 사용자 ID: " + userNo + "와 일치하지 않습니다."));
 

@@ -12,6 +12,7 @@ import java.util.Optional;
 public interface UserCouponRepository extends JpaRepository<UsedCoupon, Long>,
         QuerydslPredicateExecutor<UsedCoupon>,
         UserCouponRepositoryCustom {
+
     List<UsedCoupon> findByUserNo(String userNo);
 
     List<UsedCoupon> findByStatusAndExpiredAtBefore(UserCouponStatus status, LocalDateTime dateTime);

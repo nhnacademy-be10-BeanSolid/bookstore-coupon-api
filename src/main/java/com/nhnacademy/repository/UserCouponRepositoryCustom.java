@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface UserCouponRepositoryCustom {
     List<UsedCoupon> findActiveCouponsByUserIdAndPeriod(String userNo, LocalDateTime startDate, LocalDateTime endDate);
-    List<UsedCoupon> findUsedCouponsByUserId(String userId);
-    List<UsedCoupon> findExpiredCouponsByUserId(String userId);
+    List<UsedCoupon> findUsedCouponsByUserId(String userNo);
+    List<UsedCoupon> findExpiredCouponsByUserId(String userNo);
 
 }
