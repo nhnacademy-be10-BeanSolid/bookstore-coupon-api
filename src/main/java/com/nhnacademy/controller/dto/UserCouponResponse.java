@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @Builder
 public class UserCouponResponse {
     private Long userCouponId;
-    private String userId;
+    private String userNo;
     private Long couponPolicyId;
     private String couponName;
     private LocalDateTime issuedAt;
@@ -27,7 +27,7 @@ public class UserCouponResponse {
     public static UserCouponResponse from(UsedCoupon usedCoupon) {
         return UserCouponResponse.builder()
                 .userCouponId(usedCoupon.getUserCouponId())
-                .userId(usedCoupon.getUserId())
+                .userNo(usedCoupon.getUserNo())
                 .couponPolicyId(usedCoupon.getCouponPolicy().getCouponId())
                 .couponName(usedCoupon.getCouponPolicy().getCouponName())
                 .issuedAt(usedCoupon.getIssuedAt())

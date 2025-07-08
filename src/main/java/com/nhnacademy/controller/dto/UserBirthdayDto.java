@@ -11,6 +11,6 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserBirthdayDto {
-    private String userId;
+    private String userNo;
     private LocalDate userBirth;
 }

@@ -21,35 +21,35 @@ public class UserCouponRepositoryImpl implements UserCouponRepositoryCustom {
     }
 
     @Override
-    public List<UsedCoupon> findActiveCouponsByUserIdAndPeriod(String userId, LocalDateTime startDate, LocalDateTime endDate) {
+    public List<UsedCoupon> findActiveCouponsByUserIdAndPeriod(String userNo, LocalDateTime startDate, LocalDateTime endDate) {
         QUsedCoupon usedCoupon = QUsedCoupon.usedCoupon;
 
         return queryFactory
                 .selectFrom(usedCoupon)
-                .where(usedCoupon.userId.eq(userId)
+                .where(usedCoupon.userNo.eq(userNo)
                         .and(usedCoupon.status.eq(UserCouponStatus.ACTIVE))
                         .and(usedCoupon.issuedAt.between(startDate, endDate)))
                 .fetch();
     }
 
     @Override
-    public List<UsedCoupon> findUsedCouponsByUserId(String userId) {
+    public List<UsedCoupon> findUsedCouponsByUserId(String userNo) {
         QUsedCoupon usedCoupon = QUsedCoupon.usedCoupon;
 
         return queryFactory
                 .selectFrom(usedCoupon)
-                .where(usedCoupon.userId.eq(userId)
+                .where(usedCoupon.userNo.eq(userNo)
                         .and(usedCoupon.status.eq(UserCouponStatus.USED)))
                 .fetch();
     }
 
     @Override
-    public List<UsedCoupon> findExpiredCouponsByUserId(String userId) {
+    public List<UsedCoupon> findExpiredCouponsByUserId(String userNo) {
         QUsedCoupon usedCoupon = QUsedCoupon.usedCoupon;
 
         return queryFactory
                 .selectFrom(usedCoupon)
-                .where(usedCoupon.userId.eq(userId)
+                .where(usedCoupon.userNo.eq(userNo)
                         .and(usedCoupon.status.eq(UserCouponStatus.EXPIRED)))
                 .fetch();
     }

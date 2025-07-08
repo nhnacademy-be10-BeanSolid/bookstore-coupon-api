@@ -35,12 +35,12 @@ public class CouponScheduler {
 
         for (UserBirthdayDto user : birthdayUsers) {
             try {
-                couponService.issueBirthdayCoupon(user.getUserId(), user.getUserBirth());
-                log.info("사용자 ID {} 에게 생일 쿠폰이 성공적으로 발급되었습니다.", user.getUserId());
+                couponService.issueBirthdayCoupon(user.getUserNo(), user.getUserBirth());
+                log.info("사용자 ID {} 에게 생일 쿠폰이 성공적으로 발급되었습니다.", user.getUserNo());
             } catch (IllegalStateException e) {
-                log.warn("사용자 ID {} 에게 이미 이번 연도 생일 쿠폰이 발급되었습니다: {}", user.getUserId(), e.getMessage());
+                log.warn("사용자 ID {} 에게 이미 이번 연도 생일 쿠폰이 발급되었습니다: {}", user.getUserNo(), e.getMessage());
             } catch (Exception e) {
-                log.error("사용자 ID {} 에게 생일 쿠폰 발급 중 오류 발생: {}", user.getUserId(), e.getMessage(), e);
+                log.error("사용자 ID {} 에게 생일 쿠폰 발급 중 오류 발생: {}", user.getUserNo(), e.getMessage(), e);
             }
         }
         log.info("생일 쿠폰 발급 스케줄러 종료.");
