@@ -21,7 +21,7 @@ public class UserRegistrationDto {
         return Users.builder()
                 .userId(userId)
                 .userName(userName)
-                .userBirth(uesrBirth)
+                .userBirth(userBirth)
                 .build();
     }
 }
