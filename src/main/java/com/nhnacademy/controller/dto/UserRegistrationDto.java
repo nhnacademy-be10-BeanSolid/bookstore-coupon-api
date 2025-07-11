@@ -15,7 +15,7 @@ import java.time.LocalDate;
 public class UserRegistrationDto {
     private String userId;
     private String userName;
-    private LocalDate uesrBirth;
+    private LocalDate userBirth;
 
     public Users toEntity() {
         return Users.builder()
