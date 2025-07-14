@@ -35,7 +35,8 @@ public class CouponController {
                 request.getCouponExpiredAt(),
                 request.getCouponIssuePeriod(),
                 request.getBookIds(),
-                request.getCategoryIds()
+                request.getCategoryIds(),
+                request.getCouponType()
         );
         return new ResponseEntity<>(newPolicy, HttpStatus.CREATED);
     }
