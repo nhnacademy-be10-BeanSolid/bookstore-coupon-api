@@ -21,6 +21,10 @@ public class CouponPolicy {
     private String couponName;  // 쿠폰 정책 이름
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "coupon_type", nullable = false, length = 20)
+    private CouponType couponType; // 쿠폰 유형 (WELCOME, BIRTHDAY, GENERAL 등)
+
+    @Enumerated(EnumType.STRING)
     @Column(name = "coupon_discount_type", nullable = false, length = 20)
     private CouponDiscountType couponDiscountType; // 쿠폰 할인 유형
 
