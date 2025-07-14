@@ -12,6 +12,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import org.springframework.stereotype.Repository;
 import com.nhnacademy.domain.CouponScope;
+import com.nhnacademy.domain.CouponType;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -27,12 +28,12 @@ public class CouponPolicyRepositoryImpl implements CouponPolicyRepositoryCustom 
     }
 
     @Override
-    public Optional<CouponPolicy> findByName(String couponName) {
+    public Optional<CouponPolicy> findByCouponType(CouponType couponType) {
         QCouponPolicy couponPolicy = QCouponPolicy.couponPolicy;
 
         return Optional.ofNullable(queryFactory
                 .selectFrom(couponPolicy)
-                .where(couponPolicy.couponName.eq(couponName))
+                .where(couponPolicy.couponType.eq(couponType))
                 .fetchOne());
     }
 
