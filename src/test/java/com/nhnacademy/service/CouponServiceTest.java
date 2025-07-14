@@ -39,45 +39,45 @@ public class CouponServiceTest {
 
     @Test
     void createCouponPolicy_withBookScope_savesBooks() {
-        CouponPolicy policy = createPolicy(1L, CouponScope.BOOK);
+        CouponPolicy policy = createPolicy(1L, CouponScope.BOOK, CouponType.GENERAL);
         when(couponPolicyRepository.save(any())).thenReturn(policy);
 
         couponService.createCouponPolicy("Book Coupon", CouponDiscountType.AMOUNT, 1000,
                 5000, null, CouponScope.BOOK, LocalDateTime.now().plusDays(10), 10,
-                List.of(1L, 2L), null);
+                List.of(1L, 2L), null, CouponType.GENERAL);
 
         verify(couponBookRepository, times(2)).save(any());
     }
 
     @Test
     void createCouponPolicy_withCategoryScope_savesCategories() {
-        CouponPolicy policy = createPolicy(2L, CouponScope.CATEGORY);
+        CouponPolicy policy = createPolicy(2L, CouponScope.CATEGORY, CouponType.GENERAL);
         when(couponPolicyRepository.save(any())).thenReturn(policy);
 
         couponService.createCouponPolicy("Cat Coupon", CouponDiscountType.AMOUNT, 1000,
                 null, null, CouponScope.CATEGORY, LocalDateTime.now().plusDays(10), 10,
-                null, List.of(3L, 4L));
+                null, List.of(3L, 4L), CouponType.GENERAL);
 
         verify(couponCategoryRepository, times(2)).save(any());
     }
 
     @Test
     void getAllCouponPolicies_returnsList() {
-        when(couponPolicyRepository.findAll()).thenReturn(List.of(createPolicy(1L, CouponScope.ALL)));
+        when(couponPolicyRepository.findAll()).thenReturn(List.of(createPolicy(1L, CouponScope.ALL, CouponType.GENERAL)));
 
         assertThat(couponService.getAllCouponPolicies()).hasSize(1);
     }
 
     @Test
     void getCouponPolicyById_returnsPresent() {
-        when(couponPolicyRepository.findById(1L)).thenReturn(Optional.of(createPolicy(1L, CouponScope.ALL)));
+        when(couponPolicyRepository.findById(1L)).thenReturn(Optional.of(createPolicy(1L, CouponScope.ALL, CouponType.GENERAL)));
 
         assertThat(couponService.getCouponPolicyById(1L)).isPresent();
     }
 
     @Test
     void issueCouponToUser_withExpiredPolicy_throws() {
-        CouponPolicy policy = createPolicy(1L, CouponScope.ALL);
+        CouponPolicy policy = createPolicy(1L, CouponScope.ALL, CouponType.GENERAL);
         policy.setCouponExpiredAt(LocalDateTime.now().minusDays(1));
         when(couponPolicyRepository.findById(1L)).thenReturn(Optional.of(policy));
 
@@ -87,7 +87,7 @@ public class CouponServiceTest {
 
     @Test
     void issueCouponToUser_withValidPolicy_issuesCoupon() {
-        CouponPolicy policy = createPolicy(2L, CouponScope.ALL);
+        CouponPolicy policy = createPolicy(2L, CouponScope.ALL, CouponType.GENERAL);
         policy.setCouponIssuePeriod(7);
         when(couponPolicyRepository.findById(2L)).thenReturn(Optional.of(policy));
         when(userCouponRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
@@ -120,7 +120,7 @@ public class CouponServiceTest {
 
     @Test
     void getCouponPolicy_existingId_returnsPolicy() {
-        when(couponPolicyRepository.findById(5L)).thenReturn(Optional.of(createPolicy(5L, CouponScope.ALL)));
+        when(couponPolicyRepository.findById(5L)).thenReturn(Optional.of(createPolicy(5L, CouponScope.ALL, CouponType.GENERAL)));
 
         assertThat(couponService.getCouponPolicy(5L)).isNotNull();
     }
@@ -135,8 +135,8 @@ public class CouponServiceTest {
 
     @Test
     void issueWelcomeCoupon_success() {
-        CouponPolicy welcome = createPolicy(100L, CouponScope.ALL);
-        when(couponPolicyRepository.findByName("Welcome Coupon")).thenReturn(Optional.of(welcome));
+        CouponPolicy welcome = createPolicy(100L, CouponScope.ALL, CouponType.WELCOME);
+        when(couponPolicyRepository.findByCouponType(CouponType.WELCOME)).thenReturn(Optional.of(welcome));
         when(couponPolicyRepository.findById(100L)).thenReturn(Optional.of(welcome));
         when(userCouponRepository.findByUserNoAndCouponPolicy("user1", welcome)).thenReturn(List.of());
         when(userCouponRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
@@ -147,8 +147,8 @@ public class CouponServiceTest {
 
     @Test
     void issueWelcomeCoupon_alreadyIssued_throws() {
-        CouponPolicy welcome = createPolicy(100L, CouponScope.ALL);
-        when(couponPolicyRepository.findByName("Welcome Coupon")).thenReturn(Optional.of(welcome));
+        CouponPolicy welcome = createPolicy(100L, CouponScope.ALL, CouponType.WELCOME);
+        when(couponPolicyRepository.findByCouponType(CouponType.WELCOME)).thenReturn(Optional.of(welcome));
         when(userCouponRepository.findByUserNoAndCouponPolicy("user1", welcome))
                 .thenReturn(List.of(mock(UsedCoupon.class)));
 
@@ -158,8 +158,8 @@ public class CouponServiceTest {
 
     @Test
     void issueBirthdayCoupon_success() {
-        CouponPolicy birthday = createPolicy(200L, CouponScope.ALL);
-        when(couponPolicyRepository.findByName("Birthday Coupon")).thenReturn(Optional.of(birthday));
+        CouponPolicy birthday = createPolicy(200L, CouponScope.ALL, CouponType.BIRTHDAY);
+        when(couponPolicyRepository.findByCouponType(CouponType.BIRTHDAY)).thenReturn(Optional.of(birthday));
         when(userCouponRepository.findByUserNoAndCouponPolicy("user2", birthday)).thenReturn(List.of());
         when(userCouponRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
 
@@ -169,11 +169,11 @@ public class CouponServiceTest {
 
     @Test
     void issueBirthdayCoupon_alreadyIssuedThisYear_throws() {
-        CouponPolicy birthday = createPolicy(200L, CouponScope.ALL);
+        CouponPolicy birthday = createPolicy(200L, CouponScope.ALL, CouponType.BIRTHDAY);
         UsedCoupon prev = UsedCoupon.builder()
                 .issuedAt(LocalDateTime.now().withMonth(1))
                 .build();
-        when(couponPolicyRepository.findByName("Birthday Coupon")).thenReturn(Optional.of(birthday));
+        when(couponPolicyRepository.findByCouponType(CouponType.BIRTHDAY)).thenReturn(Optional.of(birthday));
         when(userCouponRepository.findByUserNoAndCouponPolicy("user3", birthday)).thenReturn(List.of(prev));
 
         assertThatThrownBy(() -> couponService.issueBirthdayCoupon("user3", LocalDate.of(1990, 3, 3)))
@@ -228,6 +228,7 @@ public class CouponServiceTest {
                 .couponDiscountType(CouponDiscountType.PERCENT)
                 .couponDiscountAmount(10)
                 .couponScope(CouponScope.ALL)
+                .couponType(CouponType.GENERAL)
                 .build();
 
         UsedCoupon coupon = UsedCoupon.builder()
@@ -250,6 +251,7 @@ public class CouponServiceTest {
                 .couponId(1L)
                 .couponDiscountType(null)
                 .couponScope(CouponScope.ALL)
+                .couponType(CouponType.GENERAL)
                 .build();
 
         UsedCoupon coupon = UsedCoupon.builder()
@@ -266,7 +268,7 @@ public class CouponServiceTest {
                 .isInstanceOf(CouponNotApplicableException.class);
     }
 
-    private CouponPolicy createPolicy(Long id, CouponScope scope) {
+    private CouponPolicy createPolicy(Long id, CouponScope scope, CouponType type) {
         return CouponPolicy.builder()
                 .couponId(id)
                 .couponName("Test")
@@ -274,6 +276,7 @@ public class CouponServiceTest {
                 .couponDiscountAmount(1000)
                 .couponDiscountType(CouponDiscountType.AMOUNT)
                 .couponExpiredAt(LocalDateTime.now().plusDays(1))
+                .couponType(type)
                 .build();
     }
 }
