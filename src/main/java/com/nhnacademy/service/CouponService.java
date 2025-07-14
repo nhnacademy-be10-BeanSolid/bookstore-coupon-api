@@ -5,6 +5,7 @@ import com.nhnacademy.domain.CouponCategory;
 import com.nhnacademy.domain.CouponDiscountType;
 import com.nhnacademy.domain.CouponPolicy;
 import com.nhnacademy.domain.CouponScope;
+import com.nhnacademy.domain.CouponType;
 import com.nhnacademy.domain.UsedCoupon;
 import com.nhnacademy.domain.UserCouponStatus;
 import com.nhnacademy.exception.CouponAlreadyUsedException;
@@ -18,6 +19,7 @@ import com.nhnacademy.repository.CouponCategoryRepository;
 import com.nhnacademy.repository.CouponPolicyRepository;
 import com.nhnacademy.repository.UserCouponRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +30,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -42,7 +45,7 @@ public class CouponService {
     public CouponPolicy createCouponPolicy(String name, CouponDiscountType discountType, int discountAmount,
                                            Integer minOrderAmount, Integer maxDiscountAmount,
                                            CouponScope scope, LocalDateTime expiredAt, Integer issuePeriod,
-                                           List<Long> bookIds, List<Long> categoryIds) {
+                                           List<Long> bookIds, List<Long> categoryIds, CouponType couponType) {
         CouponPolicy policy = CouponPolicy.builder()
                 .couponName(name)
                 .couponDiscountType(discountType)
@@ -52,6 +55,7 @@ public class CouponService {
                 .couponScope(scope)
                 .couponExpiredAt(expiredAt)
                 .couponIssuePeriod(issuePeriod)
+                .couponType(couponType)
                 .build();
         CouponPolicy savedPolicy = couponPolicyRepository.save(policy);
 
@@ -127,7 +131,8 @@ public class CouponService {
 
     @Transactional
     public UsedCoupon issueWelcomeCoupon(String userNo) {
-        CouponPolicy welcomePolicy = couponPolicyRepository.findByName("Welcome Coupon")
+        log.info("Attempting to find welcome coupon policy by type: WELCOME");
+        CouponPolicy welcomePolicy = couponPolicyRepository.findByCouponType(CouponType.WELCOME)
                 .orElseThrow(() -> new WelcomeCouponPolicyNotFoundException("Welcome 쿠폰 정책을 찾을 수 없습니다."));
         List<UsedCoupon> existingWelcomeCoupons = userCouponRepository.findByUserNoAndCouponPolicy(userNo, welcomePolicy);
 
@@ -139,7 +144,8 @@ public class CouponService {
 
     @Transactional
     public UsedCoupon issueBirthdayCoupon(String userNo, LocalDate userBirth) {
-        CouponPolicy birthdayPolicy = couponPolicyRepository.findByName("Birthday Coupon")
+        log.info("Attempting to find birthday coupon policy by type: BIRTHDAY");
+        CouponPolicy birthdayPolicy = couponPolicyRepository.findByCouponType(CouponType.BIRTHDAY)
                 .orElseThrow(() -> new CouponNotFoundException("Birthday 쿠폰 정책을 찾을 수 없습니다."));
 
         boolean alreadyIssuedThisYear = userCouponRepository.findByUserNoAndCouponPolicy(userNo, birthdayPolicy)
