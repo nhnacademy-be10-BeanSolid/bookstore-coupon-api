@@ -1,8 +1,8 @@
 package com.nhnacademy.scheduler;
 
+import com.nhnacademy.controller.dto.UserResponse;
 import com.nhnacademy.service.CouponService;
 import com.nhnacademy.service.ExternalUserService;
-import com.nhnacademy.controller.dto.UserBirthdayDto;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,16 +26,16 @@ public class CouponScheduler {
         log.info("생일 쿠폰 발급 스케줄러 시작: {}", LocalDateTime.now());
 
         int currentMonth = LocalDate.now().getMonthValue();
-        List<UserBirthdayDto> birthdayUsers = externalUserService.getBirthdayUsersByMonth(currentMonth);
+        List<UserResponse> birthdayUsers = externalUserService.getBirthdayUsersByMonth(currentMonth);
 
         if (birthdayUsers.isEmpty()) {
             log.info("이번 달 생일인 사용자가 없습니다.");
             return;
         }
 
-        for (UserBirthdayDto user : birthdayUsers) {
+        for (UserResponse user : birthdayUsers) {
             try {
-                couponService.issueBirthdayCoupon(user.getUserNo(), user.getUserBirth());
+                couponService.issueBirthdayCoupon(String.valueOf(user.getUserNo()), user.getUserBirth());
                 log.info("사용자 ID {} 에게 생일 쿠폰이 성공적으로 발급되었습니다.", user.getUserNo());
             } catch (IllegalStateException e) {
                 log.warn("사용자 ID {} 에게 이미 이번 연도 생일 쿠폰이 발급되었습니다: {}", user.getUserNo(), e.getMessage());
