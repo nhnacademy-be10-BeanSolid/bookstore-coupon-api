@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.time.LocalDateTime;
 
@@ -19,8 +20,14 @@ public class UserCouponResponse {
     private Long couponPolicyId;
     private String couponName;
     private int couponDiscountAmount;
+
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSSSS") // 추가
     private LocalDateTime issuedAt;
+
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSSSS") // 추가
     private LocalDateTime expiredAt;
+
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSSSS") // 추가
     private LocalDateTime usedAt;
     private UserCouponStatus status;
     private Long orderId;
