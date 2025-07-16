@@ -6,8 +6,8 @@ Content-Type: application/json
   "couponName": "가입 축하 10% 할인 (최대 5천원)",
   "couponDiscountType": "PERCENT",
   "couponDiscountAmount": 10,
-  "couponMinimumOrderAmount": 10000,
-  "couponMaximumDiscountAmount": 5000,
+  "couponMinimumOrderAmount": 50000,
+  "couponMaximumDiscountAmount": 10000,
   "couponScope": "ALL",
   "couponExpiredAt": "2025-12-31T23:59:59",
   "couponIssuePeriod": null,
@@ -100,7 +100,9 @@ Content-Type: application/json
   "couponExpiredAt": null,
   "couponIssuePeriod": 30,
   "bookIds": [],
-  "categoryIds": []
+  "categoryIds": [],
+  "couponType": "BIRTHDAY"
+
 }
 
 ### 웰컴 쿠폰 정책 등록
