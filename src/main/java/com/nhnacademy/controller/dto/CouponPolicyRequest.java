@@ -2,6 +2,7 @@ package com.nhnacademy.controller.dto;
 
 import com.nhnacademy.domain.CouponDiscountType;
 import com.nhnacademy.domain.CouponScope;
+import com.nhnacademy.domain.CouponType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -36,6 +37,9 @@ public class CouponPolicyRequest {
     private LocalDateTime couponExpiredAt;
 
     private Integer couponIssuePeriod;
+
+    @NotNull
+    private CouponType couponType;
 
     private List<Long> bookIds;
     private List<Long> categoryIds;

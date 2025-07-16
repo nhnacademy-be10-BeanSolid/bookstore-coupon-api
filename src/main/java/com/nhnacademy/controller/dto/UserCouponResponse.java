@@ -18,6 +18,7 @@ public class UserCouponResponse {
     private String userNo;
     private Long couponPolicyId;
     private String couponName;
+    private int couponDiscountAmount;
     private LocalDateTime issuedAt;
     private LocalDateTime expiredAt;
     private LocalDateTime usedAt;
@@ -30,6 +31,7 @@ public class UserCouponResponse {
                 .userNo(usedCoupon.getUserNo())
                 .couponPolicyId(usedCoupon.getCouponPolicy().getCouponId())
                 .couponName(usedCoupon.getCouponPolicy().getCouponName())
+                .couponDiscountAmount(usedCoupon.getCouponPolicy().getCouponDiscountAmount())
                 .issuedAt(usedCoupon.getIssuedAt())
                 .expiredAt(usedCoupon.getExpiredAt())
                 .usedAt(usedCoupon.getUsedAt())

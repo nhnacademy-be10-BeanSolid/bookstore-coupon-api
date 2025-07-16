@@ -7,6 +7,7 @@ import com.nhnacademy.domain.CouponPolicy;
 import com.nhnacademy.domain.UsedCoupon;
 import com.nhnacademy.service.CouponService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +17,7 @@ import jakarta.validation.Valid;
 import java.time.LocalDate;
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/coupons")
 @RequiredArgsConstructor
@@ -35,7 +37,8 @@ public class CouponController {
                 request.getCouponExpiredAt(),
                 request.getCouponIssuePeriod(),
                 request.getBookIds(),
-                request.getCategoryIds()
+                request.getCategoryIds(),
+                request.getCouponType()
         );
         return new ResponseEntity<>(newPolicy, HttpStatus.CREATED);
     }
@@ -74,6 +77,7 @@ public class CouponController {
 
     @GetMapping("/users/{userNo}/active")
     public ResponseEntity<List<UserCouponResponse>> getActiveUserCoupons(@PathVariable String userNo) {
+        log.info("Coupon-API CouponController: Received request for active coupons for userNo: {}", userNo);
         List<UsedCoupon> activeCoupons = couponService.getActiveUserCoupons(userNo);
         List<UserCouponResponse> responses = activeCoupons.stream()
                 .map(UserCouponResponse::from)
