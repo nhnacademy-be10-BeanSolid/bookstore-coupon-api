@@ -11,7 +11,7 @@ import java.time.format.DateTimeFormatter;
 @Configuration
 public class JacksonGlobalDateTimeConfig {
 
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 
     @Bean
     public Jackson2ObjectMapperBuilderCustomizer objectMapperBuilderCustomizer() {

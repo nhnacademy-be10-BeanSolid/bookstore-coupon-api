@@ -31,7 +31,8 @@ Content-Type: application/json
   "couponExpiredAt": "2025-12-31T23:59:59",
   "couponIssuePeriod": null,
   "bookIds": [],
-  "categoryIds": []
+  "categoryIds": [],
+  "couponType": "GENERAL"
 }
 
 ### 3번째 쿠폰 등록
