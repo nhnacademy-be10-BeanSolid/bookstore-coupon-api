@@ -168,3 +168,43 @@ Content-Type: application/json
 ### 할인 금액 계산 (특정 카테고리 포함)
 GET http://localhost:10352/coupons/users/1/calculate-discount/3?orderAmount=30000&categoryIds=101
 Content-Type: application/json
+
+### 해리 포터와 불의 잔 2 도서 쿠폰 등록
+POST http://localhost:10352/coupons/policy
+Content-Type: application/json
+
+{
+"couponName": "해리포터 및 흔한남매 대상 15% 할인 쿠폰",
+"couponDiscountType": "PERCENT",
+"couponDiscountAmount": 15,
+"couponMinimumOrderAmount": 10000,
+"couponMaximumDiscountAmount": 7000,
+"couponScope": "BOOK",
+"couponExpiredAt": "2025-12-31T23:59:59",
+"couponIssuePeriod": null,
+"couponType": "GENERAL",
+"bookIds": [0, 1],
+"categoryIds": null
+}
+### 사용자 178에게 해리 포터와 불의 잔 2 도서 쿠폰 발급
+POST http://localhost:10352/coupons/users/178/issue/4
+Content-Type: application/json
+
+
+### 해리포터 및 흔한남매 대상 15% 할인 쿠폰 을 찾아 couponId 확인
+POST http://localhost:10352/coupons/policy
+Content-Type: application/json
+
+{
+    "couponId": 5,
+    "couponName": "해리포터 및 흔한남매 대상 15% 할인 쿠폰",
+    "couponDiscountType": "PERCENT",
+    "couponDiscountAmount": 15,
+    "couponMinimumOrderAmount": 10000,
+    "couponMaximumDiscountAmount": 7000,
+    "couponScope": "BOOK",
+    "couponExpiredAt": "2025-12-31T23:59:59",
+    "couponIssuePeriod": null,
+    "couponType": "GENERAL",
+    "couponCreatedAt": "2025-07-17T15:00:00",
+}
