@@ -17,6 +17,11 @@ public class RabbitMQConfig {
     public static final String QUEUE_NAME = "welcome-coupon-queue";
     public static final String ROUTING_KEY = "user.registered";
 
+    // Birthday Coupon RabbitMQ Constants
+    public static final String BIRTHDAY_EXCHANGE_NAME = "birthday-exchange";
+    public static final String BIRTHDAY_QUEUE_NAME = "birthday-queue";
+    public static final String BIRTHDAY_ROUTING_KEY = "birthday.user";
+
     @Bean
     public DirectExchange userExchange() {
         return new DirectExchange(EXCHANGE_NAME);
@@ -30,6 +35,22 @@ public class RabbitMQConfig {
     @Bean
     public Binding binding(Queue welcomeCouponQueue, DirectExchange userExchange) {
         return BindingBuilder.bind(welcomeCouponQueue).to(userExchange).with(ROUTING_KEY);
+    }
+
+    // Birthday Coupon RabbitMQ Beans
+    @Bean
+    public DirectExchange birthdayExchange() {
+        return new DirectExchange(BIRTHDAY_EXCHANGE_NAME);
+    }
+
+    @Bean
+    public Queue birthdayQueue() {
+        return new Queue(BIRTHDAY_QUEUE_NAME, true);
+    }
+
+    @Bean
+    public Binding birthdayBinding(Queue birthdayQueue, DirectExchange birthdayExchange) {
+        return BindingBuilder.bind(birthdayQueue).to(birthdayExchange).with(BIRTHDAY_ROUTING_KEY);
     }
 
     @Bean
