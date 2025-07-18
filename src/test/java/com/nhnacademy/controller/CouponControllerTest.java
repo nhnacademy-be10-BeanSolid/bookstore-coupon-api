@@ -30,11 +30,9 @@ import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyList; // 이 임포트는 이제 사용되지 않을 수 있습니다.
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.isNull; // isNull 임포트 확인
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
@@ -62,7 +60,7 @@ public class CouponControllerTest {
     private CouponPolicy testCouponPolicy;
     private UsedCoupon testUsedCoupon;
     private UserCouponResponse testUserCouponResponse;
-    private String testUserNo = "testUser1";
+    private Long testUserNo = 1L;
     private Long testCouponPolicyId = 1L;
     private Long testUserCouponId = 100L;
 
@@ -196,7 +194,7 @@ public class CouponControllerTest {
         @Test
         @DisplayName("POST /users/{userNo}/issue/{couponPolicyId} - 쿠폰 발급 실패 (정책 찾을 수 없음)")
         void issueCouponToUser_policyNotFound() throws Exception {
-            doThrow(new CouponNotFoundException("정책 없음")).when(couponService).issueCouponToUser(anyString(), anyLong());
+            doThrow(new CouponNotFoundException("정책 없음")).when(couponService).issueCouponToUser(anyLong(), anyLong());
 
             mockMvc.perform(post("/coupons/users/{userNo}/issue/{couponPolicyId}", testUserNo, 999L))
                     .andExpect(status().isNotFound());
@@ -207,7 +205,7 @@ public class CouponControllerTest {
         @Test
         @DisplayName("POST /users/{userNo}/issue/{couponPolicyId} - 쿠폰 발급 실패 (정책 만료)")
         void issueCouponToUser_policyExpired() throws Exception {
-            doThrow(new CouponExpiredException("정책 만료")).when(couponService).issueCouponToUser(anyString(), anyLong());
+            doThrow(new CouponExpiredException("정책 만료")).when(couponService).issueCouponToUser(anyLong(), anyLong());
 
             mockMvc.perform(post("/coupons/users/{userNo}/issue/{couponPolicyId}", testUserNo, testCouponPolicyId))
                     .andExpect(status().isBadRequest());
@@ -231,7 +229,7 @@ public class CouponControllerTest {
         @Test
         @DisplayName("POST /users/{userNo}/issue-welcome - 웰컴 쿠폰 발급 실패 (이미 발급됨)")
         void issueWelcomeCoupon_alreadyIssued() throws Exception {
-            doThrow(new IllegalStateException("이미 발급됨")).when(couponService).issueWelcomeCoupon(anyString());
+            doThrow(new IllegalStateException("이미 발급됨")).when(couponService).issueWelcomeCoupon(anyLong());
 
             mockMvc.perform(post("/coupons/users/{userNo}/issue-welcome", testUserNo))
                     .andExpect(status().isConflict());
@@ -256,7 +254,7 @@ public class CouponControllerTest {
         @Test
         @DisplayName("POST /users/{userNo}/issue-birthday - 생일 쿠폰 발급 실패 (이미 발급됨)")
         void issueBirthdayCoupon_alreadyIssued() throws Exception {
-            doThrow(new IllegalStateException("이미 발급됨")).when(couponService).issueBirthdayCoupon(anyString(), any(LocalDate.class));
+            doThrow(new IllegalStateException("이미 발급됨")).when(couponService).issueBirthdayCoupon(anyLong(), any(LocalDate.class));
 
             mockMvc.perform(post("/coupons/users/{userNo}/issue-birthday", testUserNo)
                             .param("birthMonth", "7"))
@@ -324,7 +322,7 @@ public class CouponControllerTest {
         @DisplayName("POST /users/{userNo}/use/{userCouponId} - 쿠폰 사용 실패 (쿠폰 찾을 수 없음)")
         void useCoupon_notFound() throws Exception {
             CouponUseRequest request = new CouponUseRequest(12345L);
-            doThrow(new UserCouponNotFoundException("쿠폰 없음")).when(couponService).useCoupon(anyString(), anyLong(), anyLong());
+            doThrow(new UserCouponNotFoundException("쿠폰 없음")).when(couponService).useCoupon(anyLong(), anyLong(), anyLong());
 
             performPostRequest("/coupons/users/{userNo}/use/{userCouponId}", request, testUserNo, 999L)
                     .andExpect(status().isNotFound());
@@ -336,7 +334,7 @@ public class CouponControllerTest {
         @DisplayName("POST /users/{userNo}/use/{userCouponId} - 쿠폰 사용 실패 (이미 사용됨)")
         void useCoupon_alreadyUsed() throws Exception {
             CouponUseRequest request = new CouponUseRequest(12345L);
-            doThrow(new CouponAlreadyUsedException("이미 사용됨")).when(couponService).useCoupon(anyString(), anyLong(), anyLong());
+            doThrow(new CouponAlreadyUsedException("이미 사용됨")).when(couponService).useCoupon(anyLong(), anyLong(), anyLong());
 
             performPostRequest("/coupons/users/{userNo}/use/{userCouponId}", request, testUserNo, testUserCouponId)
                     .andExpect(status().isBadRequest());
@@ -348,7 +346,7 @@ public class CouponControllerTest {
         @DisplayName("POST /coupons/users/{userNo}/use/{userCouponId} - 쿠폰 사용 실패 (만료됨)")
         void useCoupon_expired() throws Exception {
             CouponUseRequest request = new CouponUseRequest(12345L);
-            doThrow(new CouponExpiredException("만료됨")).when(couponService).useCoupon(anyString(), anyLong(), anyLong());
+            doThrow(new CouponExpiredException("만료됨")).when(couponService).useCoupon(anyLong(), anyLong(), anyLong());
 
             performPostRequest("/coupons/users/{userNo}/use/{userCouponId}", request, testUserNo, testUserCouponId)
                     .andExpect(status().isBadRequest());
@@ -383,7 +381,7 @@ public class CouponControllerTest {
                     .thenReturn(expectedDiscount);
 
             mockMvc.perform(get("/coupons/users/{userNo}/calculate-discount/{userCouponId}", testUserNo, testUserCouponId)
-                            .param("orderAmount", String.valueOf(orderAmount))
+                            .param("orderAmount", "" + orderAmount)
                             .param("bookIds", "1", "2"))
                     .andExpect(status().isOk())
                     .andExpect(content().string(String.valueOf(expectedDiscount)));
@@ -401,7 +399,7 @@ public class CouponControllerTest {
                     .thenReturn(expectedDiscount);
 
             mockMvc.perform(get("/coupons/users/{userNo}/calculate-discount/{userCouponId}", testUserNo, testUserCouponId)
-                            .param("orderAmount", String.valueOf(orderAmount))
+                            .param("orderAmount", "" + orderAmount)
                             .param("categoryIds", "10", "11"))
                     .andExpect(status().isOk())
                     .andExpect(content().string(String.valueOf(expectedDiscount)));
@@ -412,7 +410,7 @@ public class CouponControllerTest {
         @Test
         @DisplayName("GET /coupons/users/{userNo}/calculate-discount/{userCouponId} - 할인 계산 실패 (쿠폰 찾을 수 없음)")
         void calculateDiscount_couponNotFound() throws Exception {
-            doThrow(new UserCouponNotFoundException("쿠폰 없음")).when(couponService).calculateDiscountAmount(anyString(), anyLong(), anyInt(), any(), any());
+            doThrow(new UserCouponNotFoundException("쿠폰 없음")).when(couponService).calculateDiscountAmount(anyLong(), anyLong(), anyInt(), any(), any());
 
             mockMvc.perform(get("/coupons/users/{userNo}/calculate-discount/{userCouponId}", testUserNo, 999L)
                             .param("orderAmount", "10000"))
@@ -424,7 +422,7 @@ public class CouponControllerTest {
         @Test
         @DisplayName("GET /coupons/users/{userNo}/calculate-discount/{userCouponId} - 할인 계산 실패 (쿠폰 적용 불가)")
         void calculateDiscount_notApplicable() throws Exception {
-            doThrow(new CouponNotApplicableException("적용 불가")).when(couponService).calculateDiscountAmount(anyString(), anyLong(), anyInt(), any(), any());
+            doThrow(new CouponNotApplicableException("적용 불가")).when(couponService).calculateDiscountAmount(anyLong(), anyLong(), anyInt(), any(), any());
 
             mockMvc.perform(get("/coupons/users/{userNo}/calculate-discount/{userCouponId}", testUserNo, testUserCouponId)
                             .param("orderAmount", "1000"))
@@ -436,7 +434,7 @@ public class CouponControllerTest {
         @Test
         @DisplayName("GET /coupons/users/{userNo}/calculate-discount/{userCouponId} - 할인 계산 실패 (쿠폰 만료)")
         void calculateDiscount_expired() throws Exception {
-            doThrow(new CouponExpiredException("만료됨")).when(couponService).calculateDiscountAmount(anyString(), anyLong(), anyInt(), any(), any());
+            doThrow(new CouponExpiredException("만료됨")).when(couponService).calculateDiscountAmount(anyLong(), anyLong(), anyInt(), any(), any());
 
             mockMvc.perform(get("/coupons/users/{userNo}/calculate-discount/{userCouponId}", testUserNo, testUserCouponId)
                             .param("orderAmount", "10000"))
@@ -446,3 +444,4 @@ public class CouponControllerTest {
         }
     }
 }
+

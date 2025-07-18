@@ -21,7 +21,7 @@ public class UserCouponRepositoryImpl implements UserCouponRepositoryCustom {
     }
 
     @Override
-    public List<UsedCoupon> findActiveCouponsByUserIdAndPeriod(String userNo, LocalDateTime startDate, LocalDateTime endDate) {
+    public List<UsedCoupon> findActiveCouponsByUserIdAndPeriod(Long userNo, LocalDateTime startDate, LocalDateTime endDate) {
         QUsedCoupon usedCoupon = QUsedCoupon.usedCoupon;
 
         return queryFactory
@@ -34,7 +34,7 @@ public class UserCouponRepositoryImpl implements UserCouponRepositoryCustom {
     }
 
     @Override
-    public List<UsedCoupon> findUsedCouponsByUserId(String userNo) {
+    public List<UsedCoupon> findUsedCouponsByUserId(Long userNo) {
         QUsedCoupon usedCoupon = QUsedCoupon.usedCoupon;
 
         return queryFactory
@@ -45,7 +45,7 @@ public class UserCouponRepositoryImpl implements UserCouponRepositoryCustom {
     }
 
     @Override
-    public List<UsedCoupon> findExpiredCouponsByUserId(String userNo) {
+    public List<UsedCoupon> findExpiredCouponsByUserId(Long userNo) {
         QUsedCoupon usedCoupon = QUsedCoupon.usedCoupon;
 
         return queryFactory

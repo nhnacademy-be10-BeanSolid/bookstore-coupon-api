@@ -38,7 +38,7 @@ public class CouponPolicyRepositoryImpl implements CouponPolicyRepositoryCustom 
     }
 
     @Override
-    public List<CouponPolicy> findApplicableCouponPolicies(String userNo, int orderAmount, List<Long> bookIdsInOrder, List<Long> categoryIdsInOrder) {
+    public List<CouponPolicy> findApplicableCouponPolicies(Long userNo, int orderAmount, List<Long> bookIdsInOrder, List<Long> categoryIdsInOrder) {
         QCouponPolicy policy = QCouponPolicy.couponPolicy;
         QUsedCoupon usedCoupon = QUsedCoupon.usedCoupon;
 
