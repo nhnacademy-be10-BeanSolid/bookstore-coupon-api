@@ -38,6 +38,7 @@ jobs:
         run: mvn -B package --file pom.xml
 
       - name: Run SonarQube
+        if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
         run: mvn clean verify sonar:sonar -Dsonar.projectKey=bookstore-BeanSolid-coupon-api -Dsonar.projectName='bookstore-BeanSolid-coupon-api' -Dsonar.host.url=${{ secrets.SONAR_HOST }} -Dsonar.token=${{ secrets.SONAR_TOKEN }}
 
       - name: upload file
