@@ -19,8 +19,11 @@ public class UserCouponResponse {
     private Long couponPolicyId;
     private String couponName;
     private int couponDiscountAmount;
+
     private LocalDateTime issuedAt;
+
     private LocalDateTime expiredAt;
+
     private LocalDateTime usedAt;
     private UserCouponStatus status;
     private Long orderId;
