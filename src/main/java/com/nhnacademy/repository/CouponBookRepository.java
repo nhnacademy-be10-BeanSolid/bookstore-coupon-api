@@ -9,4 +9,6 @@ public interface CouponBookRepository extends JpaRepository<CouponBook, Long>,
         QuerydslPredicateExecutor<CouponBook>,
         CouponBookRepositoryCustom {
     List<CouponBook> findByCouponId(Long couponId);
+
+    boolean existsByCouponPolicy_CouponIdAndBookId(Long couponPolicyId, Long bookId);
 }
