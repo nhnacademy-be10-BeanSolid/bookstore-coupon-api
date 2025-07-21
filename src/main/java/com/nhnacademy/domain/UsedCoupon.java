@@ -19,7 +19,7 @@ public class UsedCoupon {
     private Long userCouponId;
 
     @Column(name = "user_no")
-    private String userNo;
+    private Long userNo;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "coupon_id")

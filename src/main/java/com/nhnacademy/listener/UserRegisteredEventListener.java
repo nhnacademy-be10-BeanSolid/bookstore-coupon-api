@@ -19,7 +19,7 @@ public class UserRegisteredEventListener {
     public void handleUserRegisteredEvent(UserRegisteredEvent event) {
         log.info("Received user registered event for userNo: {}", event.getUserNo());
         try {
-            couponService.issueWelcomeCoupon(String.valueOf(event.getUserNo()));
+            couponService.issueWelcomeCoupon(event.getUserNo());
             log.info("Welcome coupon issued successfully for userNo: {}", event.getUserNo());
         } catch (Exception e) {
             log.error("Failed to issue welcome coupon for userNo {}: {}", event.getUserNo(), e.getMessage());

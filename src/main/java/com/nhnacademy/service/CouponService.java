@@ -1,25 +1,16 @@
 package com.nhnacademy.service;
 
-import com.nhnacademy.domain.CouponBook;
-import com.nhnacademy.domain.CouponCategory;
-import com.nhnacademy.domain.CouponDiscountType;
-import com.nhnacademy.domain.CouponPolicy;
-import com.nhnacademy.domain.CouponScope;
-import com.nhnacademy.domain.CouponType;
-import com.nhnacademy.domain.UsedCoupon;
-import com.nhnacademy.domain.UserCouponStatus;
-import com.nhnacademy.exception.CouponAlreadyUsedException;
-import com.nhnacademy.exception.CouponExpiredException;
-import com.nhnacademy.exception.CouponNotApplicableException;
-import com.nhnacademy.exception.CouponNotFoundException;
-import com.nhnacademy.exception.UserCouponNotFoundException;
-import com.nhnacademy.exception.WelcomeCouponPolicyNotFoundException;
+import com.nhnacademy.config.RabbitMQConfig;
+import com.nhnacademy.domain.*;
+import com.nhnacademy.dto.CouponPolicyResponseDto;
+import com.nhnacademy.exception.*;
 import com.nhnacademy.repository.CouponBookRepository;
 import com.nhnacademy.repository.CouponCategoryRepository;
 import com.nhnacademy.repository.CouponPolicyRepository;
 import com.nhnacademy.repository.UserCouponRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,6 +31,7 @@ public class CouponService {
     private final UserCouponRepository userCouponRepository;
     private final CouponBookRepository couponBookRepository;
     private final CouponCategoryRepository couponCategoryRepository;
+    private final RabbitTemplate rabbitTemplate;
 
     @Transactional
     public CouponPolicy createCouponPolicy(String name, CouponDiscountType discountType, int discountAmount,
@@ -75,8 +67,31 @@ public class CouponService {
         return savedPolicy;
     }
 
-    public List<CouponPolicy> getAllCouponPolicies() {
-        return couponPolicyRepository.findAll();
+    public List<CouponPolicyResponseDto> getAllCouponPolicies() {
+        return couponPolicyRepository.findAll().stream().map(policy -> {
+            List<Long> bookIds = null;
+            List<Long> categoryIds = null;
+            if (policy.getCouponScope() == CouponScope.BOOK) {
+                bookIds = couponBookRepository.findBookIdsByCouponId(policy.getCouponId());
+            } else if (policy.getCouponScope() == CouponScope.CATEGORY) {
+                categoryIds = couponCategoryRepository.findCategoryIdsByCouponId(policy.getCouponId());
+            }
+            return CouponPolicyResponseDto.builder()
+                    .couponId(policy.getCouponId())
+                    .couponName(policy.getCouponName())
+                    .couponDiscountType(policy.getCouponDiscountType())
+                    .couponDiscountAmount(policy.getCouponDiscountAmount())
+                    .couponMinimumOrderAmount(policy.getCouponMinimumOrderAmount())
+                    .couponMaximumDiscountAmount(policy.getCouponMaximumDiscountAmount())
+                    .couponScope(policy.getCouponScope())
+                    .couponExpiredAt(policy.getCouponExpiredAt())
+                    .couponIssuePeriod(policy.getCouponIssuePeriod())
+                    .couponType(policy.getCouponType())
+                    .couponCreatedAt(policy.getCouponCreatedAt())
+                    .bookIds(bookIds)
+                    .categoryIds(categoryIds)
+                    .build();
+        }).collect(Collectors.toList());
     }
 
     public Optional<CouponPolicy> getCouponPolicyById(Long couponId) {
@@ -84,7 +99,7 @@ public class CouponService {
     }
 
     @Transactional
-    public UsedCoupon issueCouponToUser(String userNo, Long couponPolicyId) {
+    public UsedCoupon issueCouponToUser(Long userNo, Long couponPolicyId) {
         CouponPolicy policy = couponPolicyRepository.findById(couponPolicyId)
                 .orElseThrow(() -> new CouponNotFoundException("존재하지 않는 쿠폰 정책입니다. Policy ID: " + couponPolicyId));
 
@@ -112,15 +127,32 @@ public class CouponService {
         return userCouponRepository.save(usedCoupon);
     }
 
-    public List<UsedCoupon> getActiveUserCoupons(String userNo) {
+    @Transactional
+    public UsedCoupon issueBookCoupon(com.nhnacademy.dto.IssueBookCouponRequest request) {
+        CouponPolicy policy = couponPolicyRepository.findById(request.getCouponPolicyId())
+                .orElseThrow(() -> new CouponNotFoundException("존재하지 않는 쿠폰 정책입니다. Policy ID: " + request.getCouponPolicyId()));
+
+        if (policy.getCouponScope() != CouponScope.BOOK) {
+            throw new CouponNotApplicableException("해당 쿠폰 정책은 도서 전용 쿠폰이 아닙니다.");
+        }
+
+        boolean bookCouponExists = couponBookRepository.existsByCouponPolicy_CouponIdAndBookId(request.getCouponPolicyId(), request.getBookId());
+        if (!bookCouponExists) {
+            throw new CouponNotApplicableException("해당 도서에 적용되는 쿠폰 정책이 아닙니다. Policy ID: " + request.getCouponPolicyId() + ", Book ID: " + request.getBookId());
+        }
+
+        return issueCouponToUser(request.getUserId(), request.getCouponPolicyId());
+    }
+
+    public List<UsedCoupon> getActiveUserCoupons(Long userNo) {
         return userCouponRepository.findActiveCouponsByUserIdAndPeriod(userNo, LocalDateTime.now().minusYears(100), LocalDateTime.now().plusYears(100));
     }
 
-    public List<UsedCoupon> getUsedUserCoupons(String userNo) {
+    public List<UsedCoupon> getUsedUserCoupons(Long userNo) {
         return userCouponRepository.findUsedCouponsByUserId(userNo);
     }
 
-    public List<UsedCoupon> getExpiredUserCoupons(String userNo) {
+    public List<UsedCoupon> getExpiredUserCoupons(Long userNo) {
         return userCouponRepository.findExpiredCouponsByUserId(userNo);
     }
 
@@ -130,7 +162,7 @@ public class CouponService {
     }
 
     @Transactional
-    public UsedCoupon issueWelcomeCoupon(String userNo) {
+    public UsedCoupon issueWelcomeCoupon(Long userNo) {
         log.info("Attempting to find welcome coupon policy by type: WELCOME");
         CouponPolicy welcomePolicy = couponPolicyRepository.findByCouponType(CouponType.WELCOME)
                 .orElseThrow(() -> new WelcomeCouponPolicyNotFoundException("Welcome 쿠폰 정책을 찾을 수 없습니다."));
@@ -143,7 +175,7 @@ public class CouponService {
     }
 
     @Transactional
-    public UsedCoupon issueBirthdayCoupon(String userNo, LocalDate userBirth) {
+    public UsedCoupon issueBirthdayCoupon(Long userNo, LocalDate userBirth) {
         log.info("Attempting to find birthday coupon policy by type: BIRTHDAY");
         CouponPolicy birthdayPolicy = couponPolicyRepository.findByCouponType(CouponType.BIRTHDAY)
                 .orElseThrow(() -> new CouponNotFoundException("Birthday 쿠폰 정책을 찾을 수 없습니다."));
@@ -177,7 +209,7 @@ public class CouponService {
     }
 
     @Transactional
-    public void useCoupon(String userNo, Long userCouponId, Long orderId) {
+    public void useCoupon(Long userNo, Long userCouponId, Long orderId) {
         UsedCoupon usedCoupon = userCouponRepository.findByUserNoAndUserCouponId(userNo, userCouponId)
                 .orElseThrow(() -> new UserCouponNotFoundException("쿠폰을 찾을 수 없습니다. UserCoupon ID: " + userCouponId + " 또는 사용자 ID: " + userNo + "와 일치하지 않습니다."));
 
@@ -193,7 +225,7 @@ public class CouponService {
         userCouponRepository.save(usedCoupon);
     }
 
-    public Integer calculateDiscountAmount(String userNo, Long userCouponId, int orderAmount, List<Long> bookIdsInOrder, List<Long> categoryIdsInOrder) {
+    public Integer calculateDiscountAmount(Long userNo, Long userCouponId, int orderAmount, List<Long> bookIdsInOrder, List<Long> categoryIdsInOrder) {
         UsedCoupon usedCoupon = userCouponRepository.findByUserNoAndUserCouponId(userNo, userCouponId)
                 .orElseThrow(() -> new UserCouponNotFoundException("쿠폰을 찾을 수 없습니다. UserCoupon ID: " + userCouponId + " 또는 사용자 ID: " + userNo + "와 일치하지 않습니다."));
 
@@ -235,5 +267,36 @@ public class CouponService {
             throw new CouponNotApplicableException("지원하지 않는 쿠폰 할인 유형입니다.");
         }
         return discount;
+    }
+
+    public void startCouponIssuingProcess(Long couponPolicyId) {
+        couponPolicyRepository.findById(couponPolicyId)
+                .orElseThrow(() -> new CouponNotFoundException("존재하지 않는 쿠폰 정책입니다. Policy ID: " + couponPolicyId));
+
+        log.info("Publishing CouponIssuingStartedEvent for couponPolicyId: {}", couponPolicyId);
+
+        rabbitTemplate.convertAndSend(
+                RabbitMQConfig.COUPON_ISSUING_STARTED_EXCHANGE,
+                RabbitMQConfig.COUPON_ISSUING_STARTED_ROUTING_KEY,
+                couponPolicyId
+        );
+    }
+
+    @Transactional
+    public void issueCouponToBook(Long couponPolicyId, Long bookId) {
+        CouponPolicy policy = couponPolicyRepository.findById(couponPolicyId)
+                .orElseThrow(() -> new CouponNotFoundException("존재하지 않는 쿠폰 정책입니다. Policy ID: " + couponPolicyId));
+
+        if (policy.getCouponScope() != CouponScope.BOOK) {
+            throw new CouponNotApplicableException("해당 쿠폰 정책은 도서 전용 쿠폰이 아닙니다.");
+        }
+
+        CouponBook couponBook = CouponBook.builder()
+                .couponId(policy.getCouponId())
+                .bookId(bookId)
+                .couponPolicy(policy)
+                .build();
+        couponBookRepository.save(couponBook);
+        log.info("Coupon policy {} associated with book {}.", couponPolicyId, bookId);
     }
 }

@@ -19,7 +19,7 @@ public class UserBirthEventListener {
     public void handleUserBirthEvent(UserBirthEvent event) {
         log.info("Received user birth event for userNo: {} with birth date: {}", event.getUserNo(), event.getUserBirth());
         try {
-            couponService.issueBirthdayCoupon(String.valueOf(event.getUserNo()), event.getUserBirth());
+            couponService.issueBirthdayCoupon(event.getUserNo(), event.getUserBirth());
             log.info("Birthday coupon issued successfully for userNo: {}", event.getUserNo());
         } catch (IllegalStateException e) {
             log.warn("User ID {} already received birthday coupon this year: {}", event.getUserNo(), e.getMessage());
