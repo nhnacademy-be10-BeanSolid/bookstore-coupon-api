@@ -1,4 +1,4 @@
-package com.nhnacademy.repository;
+package com.nhnacademy.repository.queryfactory;
 
 import com.nhnacademy.domain.CouponPolicy;
 import com.nhnacademy.domain.CouponType;

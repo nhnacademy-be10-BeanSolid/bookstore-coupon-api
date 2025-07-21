@@ -1,9 +1,10 @@
 package com.nhnacademy.service;
 
-import com.nhnacademy.config.RabbitMQConfig;
+import com.nhnacademy.common.config.RabbitMQConfig;
+import com.nhnacademy.common.exception.CouponAlreadyExistException;
+import com.nhnacademy.exception.*;
 import com.nhnacademy.domain.*;
 import com.nhnacademy.dto.CouponPolicyResponseDto;
-import com.nhnacademy.exception.*;
 import com.nhnacademy.repository.CouponBookRepository;
 import com.nhnacademy.repository.CouponCategoryRepository;
 import com.nhnacademy.repository.CouponPolicyRepository;
@@ -169,7 +170,7 @@ public class CouponService {
         List<UsedCoupon> existingWelcomeCoupons = userCouponRepository.findByUserNoAndCouponPolicy(userNo, welcomePolicy);
 
         if (!existingWelcomeCoupons.isEmpty()) {
-            throw new IllegalStateException(String.format("사용자 ID: %s에게 웰컴 쿠폰이 이미 발급되었습니다.", userNo));
+            throw new CouponAlreadyExistException(String.format("사용자 ID: %s에게 웰컴 쿠폰이 이미 발급되었습니다.", userNo));
         }
         return issueCouponToUser(userNo, welcomePolicy.getCouponId());
     }
@@ -185,7 +186,7 @@ public class CouponService {
                 .anyMatch(uc -> uc.getIssuedAt().getYear() == LocalDateTime.now().getYear());
 
         if (alreadyIssuedThisYear) {
-            throw new IllegalStateException(String.format("사용자 ID: %s에게 이번 연도 생일 쿠폰이 이미 발급되었습니다.", userNo));
+            throw new CouponAlreadyExistException(String.format("사용자 ID: %s에게 이번 연도 생일 쿠폰이 이미 발급되었습니다.", userNo));
         }
 
         LocalDateTime now = LocalDateTime.now();

@@ -1,7 +1,7 @@
 package com.nhnacademy.listener;
 
-import com.nhnacademy.config.RabbitMQConfig;
-import com.nhnacademy.controller.dto.IssueCouponsToUsersRequest;
+import com.nhnacademy.common.config.RabbitMQConfig;
+import com.nhnacademy.dto.request.IssueCouponsToUsersRequest;
 import com.nhnacademy.domain.CouponPolicy;
 import com.nhnacademy.domain.UsedCoupon;
 import com.nhnacademy.domain.UserCouponStatus;
