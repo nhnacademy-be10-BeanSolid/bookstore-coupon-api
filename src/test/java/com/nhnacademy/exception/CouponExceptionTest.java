@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @DisplayName("쿠폰 관련 예외 클래스 테스트")
-public class CouponExceptionTests {
+public class CouponExceptionTest {
 
     @Nested
     @DisplayName("CouponAlreadyUsedException 테스트")
