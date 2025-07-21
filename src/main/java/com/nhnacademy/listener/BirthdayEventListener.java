@@ -18,7 +18,7 @@ public class BirthdayEventListener {
     public void handleBirthdayEvent(UserBirthEvent event) {
         log.info("Received birthday event for user: {}", event.getUserNo());
         try {
-            couponService.issueBirthdayCoupon(String.valueOf(event.getUserNo()), event.getUserBirth());
+            couponService.issueBirthdayCoupon(event.getUserNo(), event.getUserBirth());
             log.info("Successfully issued birthday coupon for user: {}", event.getUserNo());
         } catch (Exception e) {
             log.error("Failed to issue birthday coupon for user {}: {}", event.getUserNo(), e.getMessage());
