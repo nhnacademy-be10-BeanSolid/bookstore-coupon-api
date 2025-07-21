@@ -16,7 +16,6 @@ class UserCouponRepositoryTest {
     @Test
     void testSave() {
         UsedCoupon usedCoupon = new UsedCoupon();
-        // Set properties for usedCoupon
         UsedCoupon savedUsedCoupon = userCouponRepository.save(usedCoupon);
         assertNotNull(savedUsedCoupon.getUserCouponId());
     }

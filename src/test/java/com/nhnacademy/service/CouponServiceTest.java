@@ -11,7 +11,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -39,13 +38,10 @@ class CouponServiceTest {
     @Test
     @DisplayName("쿠폰 정책 생성")
     void testCreateCouponPolicy() {
-        // given
         when(couponPolicyRepository.save(any(CouponPolicy.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        // when
         CouponPolicy result = couponService.createCouponPolicy("Welcome Coupon", CouponDiscountType.PERCENT, 10, 20000, 5000, CouponScope.ALL, null, 365, null, null, CouponType.WELCOME);
 
-        // then
         assertThat(result).isNotNull();
         assertThat(result.getCouponName()).isEqualTo("Welcome Coupon");
         verify(couponPolicyRepository, times(1)).save(any(CouponPolicy.class));
@@ -73,10 +69,9 @@ class CouponServiceTest {
     @Test
     @DisplayName("존재하지 않는 쿠폰 정책으로 발급 시 예외 발생")
     void testIssueCouponToUser_policyNotFound() {
-        // given
+
         when(couponPolicyRepository.findById(anyLong())).thenReturn(Optional.empty());
 
-        // when & then
         assertThrows(CouponNotFoundException.class, () -> {
             couponService.issueCouponToUser(100L, 1L);
         });

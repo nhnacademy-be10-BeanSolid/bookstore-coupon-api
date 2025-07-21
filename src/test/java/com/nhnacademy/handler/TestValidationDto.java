@@ -2,7 +2,6 @@ package com.nhnacademy.handler;
 
 import jakarta.validation.constraints.NotBlank;
 
-// 유효성 검사 (테스트용)
 public class TestValidationDto {
 
     @NotBlank(message = "필수 값입니다.")

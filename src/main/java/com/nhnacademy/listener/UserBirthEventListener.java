@@ -2,7 +2,6 @@ package com.nhnacademy.listener;
 
 import com.nhnacademy.config.RabbitMQConfig;
 import com.nhnacademy.event.UserBirthEvent;
-import com.nhnacademy.service.CouponService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;

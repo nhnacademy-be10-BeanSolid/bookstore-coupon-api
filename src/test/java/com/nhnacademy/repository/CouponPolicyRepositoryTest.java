@@ -24,7 +24,6 @@ class CouponPolicyRepositoryTest {
     @Test
     @DisplayName("쿠폰 정책 저장 및 조회")
     void testSaveAndFindById() {
-        // given
         CouponPolicy policy = CouponPolicy.builder()
                 .couponName("10% Discount Coupon")
                 .couponType(CouponType.GENERAL)
@@ -32,16 +31,14 @@ class CouponPolicyRepositoryTest {
                 .couponDiscountAmount(10)
                 .couponMinimumOrderAmount(20000)
                 .couponMaximumDiscountAmount(3000)
-                .couponScope(CouponScope.ALL) // `ALL`로 수정
+                .couponScope(CouponScope.ALL)
                 .couponExpiredAt(LocalDateTime.now().plusDays(60))
                 .couponIssuePeriod(30)
                 .build();
 
-        // when
         CouponPolicy savedPolicy = couponPolicyRepository.save(policy);
         CouponPolicy foundPolicy = couponPolicyRepository.findById(savedPolicy.getCouponId()).orElse(null);
 
-        // then
         assertThat(savedPolicy).isNotNull();
         assertThat(savedPolicy.getCouponId()).isNotNull();
         assertThat(foundPolicy).isNotNull();
