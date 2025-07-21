@@ -114,6 +114,23 @@ public class CouponService {
         return userCouponRepository.save(usedCoupon);
     }
 
+    @Transactional
+    public UsedCoupon issueBookCoupon(com.nhnacademy.dto.IssueBookCouponRequest request) {
+        CouponPolicy policy = couponPolicyRepository.findById(request.getCouponPolicyId())
+                .orElseThrow(() -> new CouponNotFoundException("존재하지 않는 쿠폰 정책입니다. Policy ID: " + request.getCouponPolicyId()));
+
+        if (policy.getCouponScope() != CouponScope.BOOK) {
+            throw new CouponNotApplicableException("해당 쿠폰 정책은 도서 전용 쿠폰이 아닙니다.");
+        }
+
+        boolean bookCouponExists = couponBookRepository.existsByCouponPolicy_CouponIdAndBookId(request.getCouponPolicyId(), request.getBookId());
+        if (!bookCouponExists) {
+            throw new CouponNotApplicableException("해당 도서에 적용되는 쿠폰 정책이 아닙니다. Policy ID: " + request.getCouponPolicyId() + ", Book ID: " + request.getBookId());
+        }
+
+        return issueCouponToUser(request.getUserId(), request.getCouponPolicyId());
+    }
+
     public List<UsedCoupon> getActiveUserCoupons(Long userNo) {
         return userCouponRepository.findActiveCouponsByUserIdAndPeriod(userNo, LocalDateTime.now().minusYears(100), LocalDateTime.now().plusYears(100));
     }
@@ -250,5 +267,23 @@ public class CouponService {
                 RabbitMQConfig.COUPON_ISSUING_STARTED_ROUTING_KEY,
                 couponPolicyId
         );
+    }
+
+    @Transactional
+    public void issueCouponToBook(Long couponPolicyId, Long bookId) {
+        CouponPolicy policy = couponPolicyRepository.findById(couponPolicyId)
+                .orElseThrow(() -> new CouponNotFoundException("존재하지 않는 쿠폰 정책입니다. Policy ID: " + couponPolicyId));
+
+        if (policy.getCouponScope() != CouponScope.BOOK) {
+            throw new CouponNotApplicableException("해당 쿠폰 정책은 도서 전용 쿠폰이 아닙니다.");
+        }
+
+        CouponBook couponBook = CouponBook.builder()
+                .couponId(policy.getCouponId())
+                .bookId(bookId)
+                .couponPolicy(policy)
+                .build();
+        couponBookRepository.save(couponBook);
+        log.info("Coupon policy {} associated with book {}.", couponPolicyId, bookId);
     }
 }
