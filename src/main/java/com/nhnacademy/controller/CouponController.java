@@ -5,6 +5,7 @@ import com.nhnacademy.controller.dto.CouponUseRequest;
 import com.nhnacademy.controller.dto.UserCouponResponse;
 import com.nhnacademy.domain.CouponPolicy;
 import com.nhnacademy.domain.UsedCoupon;
+import com.nhnacademy.dto.CouponPolicyResponseDto;
 import com.nhnacademy.service.CouponService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,8 +45,8 @@ public class CouponController {
     }
 
     @GetMapping("/policy")
-    public ResponseEntity<List<CouponPolicy>> getAllCouponPolicies() {
-        List<CouponPolicy> policies = couponService.getAllCouponPolicies();
+    public ResponseEntity<List<CouponPolicyResponseDto>> getAllCouponPolicies() {
+        List<CouponPolicyResponseDto> policies = couponService.getAllCouponPolicies();
         return new ResponseEntity<>(policies, HttpStatus.OK);
     }
 
