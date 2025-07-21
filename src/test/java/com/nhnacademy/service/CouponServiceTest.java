@@ -1,5 +1,6 @@
 package com.nhnacademy.service;
 
+import com.nhnacademy.common.exception.CouponAlreadyExistException;
 import com.nhnacademy.domain.*;
 import com.nhnacademy.exception.*;
 import com.nhnacademy.repository.*;
@@ -153,7 +154,7 @@ public class CouponServiceTest {
                 .thenReturn(List.of(mock(UsedCoupon.class)));
 
         assertThatThrownBy(() -> couponService.issueWelcomeCoupon("user1"))
-                .isInstanceOf(IllegalStateException.class);
+                .isInstanceOf(CouponAlreadyExistException.class);
     }
 
     @Test
@@ -177,7 +178,7 @@ public class CouponServiceTest {
         when(userCouponRepository.findByUserNoAndCouponPolicy("user3", birthday)).thenReturn(List.of(prev));
 
         assertThatThrownBy(() -> couponService.issueBirthdayCoupon("user3", LocalDate.of(1990, 3, 3)))
-                .isInstanceOf(IllegalStateException.class);
+                .isInstanceOf(CouponAlreadyExistException.class);
     }
 
     @Test

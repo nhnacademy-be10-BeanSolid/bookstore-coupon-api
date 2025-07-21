@@ -1,5 +1,6 @@
 package com.nhnacademy.service;
 
+import com.nhnacademy.common.exception.CouponAlreadyExistException;
 import com.nhnacademy.domain.CouponBook;
 import com.nhnacademy.domain.CouponCategory;
 import com.nhnacademy.domain.CouponDiscountType;
@@ -8,12 +9,7 @@ import com.nhnacademy.domain.CouponScope;
 import com.nhnacademy.domain.CouponType;
 import com.nhnacademy.domain.UsedCoupon;
 import com.nhnacademy.domain.UserCouponStatus;
-import com.nhnacademy.exception.CouponAlreadyUsedException;
-import com.nhnacademy.exception.CouponExpiredException;
-import com.nhnacademy.exception.CouponNotApplicableException;
-import com.nhnacademy.exception.CouponNotFoundException;
-import com.nhnacademy.exception.UserCouponNotFoundException;
-import com.nhnacademy.exception.WelcomeCouponPolicyNotFoundException;
+import com.nhnacademy.exception.*;
 import com.nhnacademy.repository.CouponBookRepository;
 import com.nhnacademy.repository.CouponCategoryRepository;
 import com.nhnacademy.repository.CouponPolicyRepository;
@@ -28,7 +24,6 @@ import java.time.LocalDateTime;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -137,7 +132,7 @@ public class CouponService {
         List<UsedCoupon> existingWelcomeCoupons = userCouponRepository.findByUserNoAndCouponPolicy(userNo, welcomePolicy);
 
         if (!existingWelcomeCoupons.isEmpty()) {
-            throw new IllegalStateException(String.format("사용자 ID: %s에게 웰컴 쿠폰이 이미 발급되었습니다.", userNo));
+            throw new CouponAlreadyExistException(String.format("사용자 ID: %s에게 웰컴 쿠폰이 이미 발급되었습니다.", userNo));
         }
         return issueCouponToUser(userNo, welcomePolicy.getCouponId());
     }
@@ -153,7 +148,7 @@ public class CouponService {
                 .anyMatch(uc -> uc.getIssuedAt().getYear() == LocalDateTime.now().getYear());
 
         if (alreadyIssuedThisYear) {
-            throw new IllegalStateException(String.format("사용자 ID: %s에게 이번 연도 생일 쿠폰이 이미 발급되었습니다.", userNo));
+            throw new CouponAlreadyExistException(String.format("사용자 ID: %s에게 이번 연도 생일 쿠폰이 이미 발급되었습니다.", userNo));
         }
 
         LocalDateTime now = LocalDateTime.now();

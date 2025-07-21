@@ -1,10 +1,8 @@
 package com.nhnacademy.exception;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import com.nhnacademy.common.exception.BadRequestException;
 
-@ResponseStatus(HttpStatus.BAD_REQUEST)
-public class CouponNotApplicableException extends RuntimeException {
+public class CouponNotApplicableException extends BadRequestException {
     public CouponNotApplicableException(String message) {
         super(message);
     }

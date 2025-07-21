@@ -1,7 +1,7 @@
 package com.nhnacademy.repository.impl;
 
 import com.nhnacademy.domain.QCouponCategory;
-import com.nhnacademy.repository.CouponCategoryRepositoryCustom;
+import com.nhnacademy.repository.queryfactory.CouponCategoryRepositoryCustom;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import org.springframework.stereotype.Repository;

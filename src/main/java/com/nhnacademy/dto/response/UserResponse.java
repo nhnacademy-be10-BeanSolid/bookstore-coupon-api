@@ -1,4 +1,4 @@
-package com.nhnacademy.controller.dto;
+package com.nhnacademy.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

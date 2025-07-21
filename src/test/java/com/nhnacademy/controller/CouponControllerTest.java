@@ -1,15 +1,11 @@
 package com.nhnacademy.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nhnacademy.controller.dto.CouponPolicyRequest;
-import com.nhnacademy.controller.dto.CouponUseRequest;
-import com.nhnacademy.controller.dto.UserCouponResponse;
+import com.nhnacademy.common.exception.CouponAlreadyExistException;
+import com.nhnacademy.dto.request.CouponUseRequest;
+import com.nhnacademy.dto.response.UserCouponResponse;
 import com.nhnacademy.domain.*;
-import com.nhnacademy.exception.CouponAlreadyUsedException;
-import com.nhnacademy.exception.CouponExpiredException;
-import com.nhnacademy.exception.CouponNotApplicableException;
-import com.nhnacademy.exception.CouponNotFoundException;
-import com.nhnacademy.exception.UserCouponNotFoundException;
+import com.nhnacademy.exception.*;
 import com.nhnacademy.service.CouponService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -25,12 +21,10 @@ import org.springframework.test.web.servlet.ResultActions;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyList; // 이 임포트는 이제 사용되지 않을 수 있습니다.
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -62,9 +56,9 @@ public class CouponControllerTest {
     private CouponPolicy testCouponPolicy;
     private UsedCoupon testUsedCoupon;
     private UserCouponResponse testUserCouponResponse;
-    private String testUserNo = "testUser1";
-    private Long testCouponPolicyId = 1L;
-    private Long testUserCouponId = 100L;
+    private final String testUserNo = "testUser1";
+    private final Long testCouponPolicyId = 1L;
+    private final Long testUserCouponId = 100L;
 
     @BeforeEach
     void setUp() {
@@ -231,7 +225,7 @@ public class CouponControllerTest {
         @Test
         @DisplayName("POST /users/{userNo}/issue-welcome - 웰컴 쿠폰 발급 실패 (이미 발급됨)")
         void issueWelcomeCoupon_alreadyIssued() throws Exception {
-            doThrow(new IllegalStateException("이미 발급됨")).when(couponService).issueWelcomeCoupon(anyString());
+            doThrow(new CouponAlreadyExistException("이미 발급됨")).when(couponService).issueWelcomeCoupon(anyString());
 
             mockMvc.perform(post("/coupons/users/{userNo}/issue-welcome", testUserNo))
                     .andExpect(status().isConflict());
@@ -256,7 +250,7 @@ public class CouponControllerTest {
         @Test
         @DisplayName("POST /users/{userNo}/issue-birthday - 생일 쿠폰 발급 실패 (이미 발급됨)")
         void issueBirthdayCoupon_alreadyIssued() throws Exception {
-            doThrow(new IllegalStateException("이미 발급됨")).when(couponService).issueBirthdayCoupon(anyString(), any(LocalDate.class));
+            doThrow(new CouponAlreadyExistException("이미 발급됨")).when(couponService).issueBirthdayCoupon(anyString(), any(LocalDate.class));
 
             mockMvc.perform(post("/coupons/users/{userNo}/issue-birthday", testUserNo)
                             .param("birthMonth", "7"))

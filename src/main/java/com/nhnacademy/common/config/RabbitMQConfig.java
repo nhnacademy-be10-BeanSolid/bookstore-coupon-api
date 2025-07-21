@@ -1,4 +1,4 @@
-package com.nhnacademy.config;
+package com.nhnacademy.common.config;
 
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
