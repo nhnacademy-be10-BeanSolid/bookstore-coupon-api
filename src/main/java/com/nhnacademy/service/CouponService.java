@@ -1,20 +1,9 @@
 package com.nhnacademy.service;
 
 import com.nhnacademy.config.RabbitMQConfig;
-import com.nhnacademy.domain.CouponBook;
-import com.nhnacademy.domain.CouponCategory;
-import com.nhnacademy.domain.CouponDiscountType;
-import com.nhnacademy.domain.CouponPolicy;
-import com.nhnacademy.domain.CouponScope;
-import com.nhnacademy.domain.CouponType;
-import com.nhnacademy.domain.UsedCoupon;
-import com.nhnacademy.domain.UserCouponStatus;
-import com.nhnacademy.exception.CouponAlreadyUsedException;
-import com.nhnacademy.exception.CouponExpiredException;
-import com.nhnacademy.exception.CouponNotApplicableException;
-import com.nhnacademy.exception.CouponNotFoundException;
-import com.nhnacademy.exception.UserCouponNotFoundException;
-import com.nhnacademy.exception.WelcomeCouponPolicyNotFoundException;
+import com.nhnacademy.domain.*;
+import com.nhnacademy.dto.CouponPolicyResponseDto;
+import com.nhnacademy.exception.*;
 import com.nhnacademy.repository.CouponBookRepository;
 import com.nhnacademy.repository.CouponCategoryRepository;
 import com.nhnacademy.repository.CouponPolicyRepository;
@@ -30,6 +19,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -77,8 +67,31 @@ public class CouponService {
         return savedPolicy;
     }
 
-    public List<CouponPolicy> getAllCouponPolicies() {
-        return couponPolicyRepository.findAll();
+    public List<CouponPolicyResponseDto> getAllCouponPolicies() {
+        return couponPolicyRepository.findAll().stream().map(policy -> {
+            List<Long> bookIds = null;
+            List<Long> categoryIds = null;
+            if (policy.getCouponScope() == CouponScope.BOOK) {
+                bookIds = couponBookRepository.findBookIdsByCouponId(policy.getCouponId());
+            } else if (policy.getCouponScope() == CouponScope.CATEGORY) {
+                categoryIds = couponCategoryRepository.findCategoryIdsByCouponId(policy.getCouponId());
+            }
+            return CouponPolicyResponseDto.builder()
+                    .couponId(policy.getCouponId())
+                    .couponName(policy.getCouponName())
+                    .couponDiscountType(policy.getCouponDiscountType())
+                    .couponDiscountAmount(policy.getCouponDiscountAmount())
+                    .couponMinimumOrderAmount(policy.getCouponMinimumOrderAmount())
+                    .couponMaximumDiscountAmount(policy.getCouponMaximumDiscountAmount())
+                    .couponScope(policy.getCouponScope())
+                    .couponExpiredAt(policy.getCouponExpiredAt())
+                    .couponIssuePeriod(policy.getCouponIssuePeriod())
+                    .couponType(policy.getCouponType())
+                    .couponCreatedAt(policy.getCouponCreatedAt())
+                    .bookIds(bookIds)
+                    .categoryIds(categoryIds)
+                    .build();
+        }).collect(Collectors.toList());
     }
 
     public Optional<CouponPolicy> getCouponPolicyById(Long couponId) {
