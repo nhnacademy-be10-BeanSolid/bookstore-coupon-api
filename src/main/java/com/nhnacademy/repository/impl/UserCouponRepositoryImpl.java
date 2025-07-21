@@ -28,7 +28,6 @@ public class UserCouponRepositoryImpl implements UserCouponRepositoryCustom {
                 .selectFrom(usedCoupon)
                 .where(usedCoupon.userNo.eq(userNo)
                         .and(usedCoupon.status.eq(UserCouponStatus.ACTIVE))
-                        .and(usedCoupon.issuedAt.between(startDate, endDate))
                         .and(usedCoupon.expiredAt.after(LocalDateTime.now())))
                 .fetch();
     }
