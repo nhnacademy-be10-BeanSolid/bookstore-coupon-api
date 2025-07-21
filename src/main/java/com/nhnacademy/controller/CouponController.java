@@ -75,6 +75,12 @@ public class CouponController {
         return new ResponseEntity<>(UserCouponResponse.from(birthdayCoupon), HttpStatus.CREATED);
     }
 
+    @PostMapping("/issue/book")
+    public ResponseEntity<UserCouponResponse> issueBookCoupon(@RequestBody com.nhnacademy.dto.IssueBookCouponRequest request) {
+        UsedCoupon issuedCoupon = couponService.issueBookCoupon(request);
+        return new ResponseEntity<>(UserCouponResponse.from(issuedCoupon), HttpStatus.CREATED);
+    }
+
     @GetMapping("/users/{userNo}/active")
     public ResponseEntity<List<UserCouponResponse>> getActiveUserCoupons(@PathVariable Long userNo) {
         log.info("Coupon-API CouponController: Received request for active coupons for userNo: {}", userNo);
