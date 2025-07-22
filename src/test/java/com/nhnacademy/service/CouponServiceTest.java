@@ -8,7 +8,7 @@ import com.nhnacademy.domain.enumtype.UserCouponStatus;
 import com.nhnacademy.dto.request.CouponPolicyRequestDto;
 import com.nhnacademy.exception.CouponNotFoundException;
 import com.nhnacademy.repository.CouponPolicyRepository;
-import com.nhnacademy.repository.UserCouponRepository;
+import com.nhnacademy.repository.UserCouponListRepository;
 import com.nhnacademy.service.impl.CouponServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -31,7 +31,7 @@ class CouponServiceTest {
     private CouponPolicyRepository couponPolicyRepository;
 
     @Mock
-    private UserCouponRepository userCouponRepository;
+    private UserCouponListRepository userCouponListRepository;
 
     @InjectMocks
     private CouponServiceImpl couponService;
@@ -75,7 +75,7 @@ class CouponServiceTest {
                 .couponIssuePeriod(30)
                 .build();
         when(couponPolicyRepository.findById(anyLong())).thenReturn(Optional.of(policy));
-        when(userCouponRepository.save(any(UserCouponList.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(userCouponListRepository.save(any(UserCouponList.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         UserCouponList result = couponService.issueCouponToUser(100L, 1L);
 
@@ -83,7 +83,7 @@ class CouponServiceTest {
         assertThat(result.getUserNo()).isEqualTo(100L);
         assertThat(result.getStatus()).isEqualTo(UserCouponStatus.ACTIVE);
         verify(couponPolicyRepository, times(1)).findById(1L);
-        verify(userCouponRepository, times(1)).save(any(UserCouponList.class));
+        verify(userCouponListRepository, times(1)).save(any(UserCouponList.class));
     }
 
     @Test

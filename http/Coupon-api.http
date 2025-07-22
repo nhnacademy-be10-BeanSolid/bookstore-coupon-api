@@ -1,4 +1,4 @@
-### 쿠폰 등록
+### welcome 쿠폰 등록
 POST http://localhost:10352/coupons/policy
 Content-Type: application/json
 
@@ -44,12 +44,13 @@ Content-Type: application/json
   "couponDiscountType": "AMOUNT",
   "couponDiscountAmount": 10000,
   "couponMinimumOrderAmount": 50000,
-  "couponMaximumDiscountAmount": null,
+  "couponMaximumDiscountAmount": 10000,
   "couponScope": "ALL",
   "couponExpiredAt": "2025-12-31 23:59:59",
   "couponIssuePeriod": 30,
   "bookIds": [],
-  "categoryIds": []
+  "categoryIds": [],
+  "couponType": "GENERAL"
 }
 
 ### 도서 부분 쿠폰 등록
@@ -66,7 +67,8 @@ Content-Type: application/json
   "couponExpiredAt": "2025-12-31 23:59:59",
   "couponIssuePeriod": null,
   "bookIds": [10, 25, 30],
-  "categoryIds": []
+  "categoryIds": [],
+  "couponType": "GENERAL"
 }
 
 ### 카테고리 부분 쿠폰 등록

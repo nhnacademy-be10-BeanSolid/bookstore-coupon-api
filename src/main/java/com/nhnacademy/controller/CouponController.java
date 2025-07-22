@@ -16,7 +16,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-
 import java.time.LocalDate;
 import java.util.List;
 
@@ -35,20 +34,19 @@ public class CouponController {
             throw new ValidationFailedException(bindingResult);
         }
 
-        CouponPolicy newPolicy = couponService.createCouponPolicy(request);
-        return new ResponseEntity<>(newPolicy, HttpStatus.CREATED);
+        return new ResponseEntity<>(couponService.createCouponPolicy(request), HttpStatus.CREATED);
     }
 
     @GetMapping("/policy")
     public ResponseEntity<List<CouponPolicyResponseDto>> getAllCouponPolicies() {
-        List<CouponPolicyResponseDto> policies = couponService.getAllCouponPolicies();
-        return new ResponseEntity<>(policies, HttpStatus.OK);
+
+        return new ResponseEntity<>(couponService.getAllCouponPolicies(), HttpStatus.OK);
     }
 
     @GetMapping("/policy/{policyId}")
     public ResponseEntity<CouponPolicy> getCouponPolicy(@PathVariable Long policyId) {
-        CouponPolicy policy = couponService.getCouponPolicy(policyId);
-        return new ResponseEntity<>(policy, HttpStatus.OK);
+
+        return new ResponseEntity<>(couponService.getCouponPolicy(policyId), HttpStatus.OK);
     }
 
     @PostMapping("/users/{userNo}/issue/{couponPolicyId}")
