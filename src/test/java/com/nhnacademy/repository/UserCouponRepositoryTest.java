@@ -1,6 +1,6 @@
 package com.nhnacademy.repository;
 
-import com.nhnacademy.domain.UsedCoupon;
+import com.nhnacademy.domain.UserCoupon;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -15,8 +15,8 @@ class UserCouponRepositoryTest {
 
     @Test
     void testSave() {
-        UsedCoupon usedCoupon = new UsedCoupon();
-        UsedCoupon savedUsedCoupon = userCouponRepository.save(usedCoupon);
-        assertNotNull(savedUsedCoupon.getUserCouponId());
+        UserCoupon userCoupon = new UserCoupon();
+        UserCoupon savedUserCoupon = userCouponRepository.save(userCoupon);
+        assertNotNull(savedUserCoupon.getUserCouponId());
     }
 }

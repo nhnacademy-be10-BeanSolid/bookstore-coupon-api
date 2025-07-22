@@ -1,6 +1,7 @@
 package com.nhnacademy.repository.impl;
 
-import com.nhnacademy.domain.QUsedCoupon;
+import com.nhnacademy.domain.QUserCoupon;
+import com.nhnacademy.domain.UserCoupon;
 import com.nhnacademy.domain.UserCouponStatus;
 import com.nhnacademy.repository.queryfactory.UserCouponRepositoryCustom;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -9,7 +10,6 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import com.nhnacademy.domain.UsedCoupon;
 
 @Repository
 public class UserCouponRepositoryImpl implements UserCouponRepositoryCustom {
@@ -21,8 +21,8 @@ public class UserCouponRepositoryImpl implements UserCouponRepositoryCustom {
     }
 
     @Override
-    public List<UsedCoupon> findActiveCouponsByUserIdAndPeriod(Long userNo, LocalDateTime startDate, LocalDateTime endDate) {
-        QUsedCoupon usedCoupon = QUsedCoupon.usedCoupon;
+    public List<UserCoupon> findActiveCouponsByUserIdAndPeriod(Long userNo, LocalDateTime startDate, LocalDateTime endDate) {
+        QUserCoupon usedCoupon = QUserCoupon.userCoupon;
 
         return queryFactory
                 .selectFrom(usedCoupon)
@@ -33,8 +33,8 @@ public class UserCouponRepositoryImpl implements UserCouponRepositoryCustom {
     }
 
     @Override
-    public List<UsedCoupon> findUsedCouponsByUserId(Long userNo) {
-        QUsedCoupon usedCoupon = QUsedCoupon.usedCoupon;
+    public List<UserCoupon> findUsedCouponsByUserId(Long userNo) {
+        QUserCoupon usedCoupon = QUserCoupon.userCoupon;
 
         return queryFactory
                 .selectFrom(usedCoupon)
@@ -44,8 +44,8 @@ public class UserCouponRepositoryImpl implements UserCouponRepositoryCustom {
     }
 
     @Override
-    public List<UsedCoupon> findExpiredCouponsByUserId(Long userNo) {
-        QUsedCoupon usedCoupon = QUsedCoupon.usedCoupon;
+    public List<UserCoupon> findExpiredCouponsByUserId(Long userNo) {
+        QUserCoupon usedCoupon = QUserCoupon.userCoupon;
 
         return queryFactory
                 .selectFrom(usedCoupon)

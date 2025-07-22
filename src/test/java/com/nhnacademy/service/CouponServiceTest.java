@@ -55,15 +55,15 @@ class CouponServiceTest {
                 .couponIssuePeriod(30)
                 .build();
         when(couponPolicyRepository.findById(anyLong())).thenReturn(Optional.of(policy));
-        when(userCouponRepository.save(any(UsedCoupon.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(userCouponRepository.save(any(UserCoupon.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        UsedCoupon result = couponService.issueCouponToUser(100L, 1L);
+        UserCoupon result = couponService.issueCouponToUser(100L, 1L);
 
         assertThat(result).isNotNull();
         assertThat(result.getUserNo()).isEqualTo(100L);
         assertThat(result.getStatus()).isEqualTo(UserCouponStatus.ACTIVE);
         verify(couponPolicyRepository, times(1)).findById(1L);
-        verify(userCouponRepository, times(1)).save(any(UsedCoupon.class));
+        verify(userCouponRepository, times(1)).save(any(UserCoupon.class));
     }
 
     @Test

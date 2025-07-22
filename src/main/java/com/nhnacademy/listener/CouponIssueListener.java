@@ -3,7 +3,7 @@ package com.nhnacademy.listener;
 import com.nhnacademy.common.config.RabbitMQConfig;
 import com.nhnacademy.dto.request.IssueCouponsToUsersRequest;
 import com.nhnacademy.domain.CouponPolicy;
-import com.nhnacademy.domain.UsedCoupon;
+import com.nhnacademy.domain.UserCoupon;
 import com.nhnacademy.domain.UserCouponStatus;
 import com.nhnacademy.exception.CouponNotFoundException;
 import com.nhnacademy.repository.CouponPolicyRepository;
@@ -34,7 +34,7 @@ public class CouponIssueListener {
         CouponPolicy couponPolicy = couponPolicyRepository.findById(request.couponPolicyId())
                 .orElseThrow(() -> new CouponNotFoundException("Coupon policy not found for ID: " + request.couponPolicyId()));
 
-        List<UsedCoupon> userCouponsToSave = request.userNos().stream()
+        List<UserCoupon> userCouponsToSave = request.userNos().stream()
                 .map(userNo -> {
                     LocalDateTime userCouponExpiredAt;
                     if (couponPolicy.getCouponIssuePeriod() != null) {
@@ -45,7 +45,7 @@ public class CouponIssueListener {
                         userCouponExpiredAt = LocalDateTime.now().plusDays(365); // Default 1 year if no period or fixed expiry
                     }
 
-                    return UsedCoupon.builder()
+                    return UserCoupon.builder()
                             .userNo(userNo)
                             .couponPolicy(couponPolicy)
                             .issuedAt(LocalDateTime.now())

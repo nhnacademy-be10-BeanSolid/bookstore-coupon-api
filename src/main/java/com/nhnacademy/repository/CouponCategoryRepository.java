@@ -13,6 +13,6 @@ public interface CouponCategoryRepository extends JpaRepository<CouponCategory, 
         CouponCategoryRepositoryCustom {
     List<CouponCategory> findByCouponId(Long couponId);
 
-    @Query("SELECT cc.categoryId FROM CouponCategory cc WHERE cc.couponId = :couponId")
+    @Query("SELECT cc.categoryId FROM CouponCategory cc WHERE cc.couponPolicy.couponId = :couponId")
     List<Long> findCategoryIdsByCouponId(@Param("couponId") Long couponId);
 }

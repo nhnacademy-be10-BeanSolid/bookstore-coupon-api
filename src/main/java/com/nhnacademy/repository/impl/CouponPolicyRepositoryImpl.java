@@ -1,18 +1,11 @@
 package com.nhnacademy.repository.impl;
 
-import com.nhnacademy.domain.CouponPolicy;
-import com.nhnacademy.domain.QCouponBook;
-import com.nhnacademy.domain.QCouponCategory;
-import com.nhnacademy.domain.QCouponPolicy;
-import com.nhnacademy.domain.QUsedCoupon;
-import com.nhnacademy.domain.UserCouponStatus;
+import com.nhnacademy.domain.*;
 import com.nhnacademy.repository.queryfactory.CouponPolicyRepositoryCustom;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import org.springframework.stereotype.Repository;
-import com.nhnacademy.domain.CouponScope;
-import com.nhnacademy.domain.CouponType;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -40,7 +33,7 @@ public class CouponPolicyRepositoryImpl implements CouponPolicyRepositoryCustom 
     @Override
     public List<CouponPolicy> findApplicableCouponPolicies(Long userNo, int orderAmount, List<Long> bookIdsInOrder, List<Long> categoryIdsInOrder) {
         QCouponPolicy policy = QCouponPolicy.couponPolicy;
-        QUsedCoupon usedCoupon = QUsedCoupon.usedCoupon;
+        QUserCoupon usedCoupon = QUserCoupon.userCoupon;
 
         BooleanExpression commonConditions = policy.couponMinimumOrderAmount.loe(orderAmount)
                 .and(policy.couponExpiredAt.after(LocalDateTime.now()));

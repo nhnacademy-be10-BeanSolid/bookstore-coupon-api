@@ -1,6 +1,6 @@
 package com.nhnacademy.dto.response;
 
-import com.nhnacademy.domain.UsedCoupon;
+import com.nhnacademy.domain.UserCoupon;
 import com.nhnacademy.domain.UserCouponStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,28 +28,28 @@ public class UserCouponResponse {
     private UserCouponStatus status;
     private Long orderId;
 
-    public static UserCouponResponse from(UsedCoupon usedCoupon) {
+    public static UserCouponResponse from(UserCoupon userCoupon) {
         Long couponPolicyId = null;
         String couponName = null;
         int couponDiscountAmount = 0;
 
-        if (usedCoupon.getCouponPolicy() != null) {
-            couponPolicyId = usedCoupon.getCouponPolicy().getCouponId();
-            couponName = usedCoupon.getCouponPolicy().getCouponName();
-            couponDiscountAmount = usedCoupon.getCouponPolicy().getCouponDiscountAmount();
+        if (userCoupon.getCouponPolicy() != null) {
+            couponPolicyId = userCoupon.getCouponPolicy().getCouponId();
+            couponName = userCoupon.getCouponPolicy().getCouponName();
+            couponDiscountAmount = userCoupon.getCouponPolicy().getCouponDiscountAmount();
         }
 
         return UserCouponResponse.builder()
-                .userCouponId(usedCoupon.getUserCouponId())
-                .userNo(usedCoupon.getUserNo())
+                .userCouponId(userCoupon.getUserCouponId())
+                .userNo(userCoupon.getUserNo())
                 .couponPolicyId(couponPolicyId)
                 .couponName(couponName)
                 .couponDiscountAmount(couponDiscountAmount)
-                .issuedAt(usedCoupon.getIssuedAt())
-                .expiredAt(usedCoupon.getExpiredAt())
-                .usedAt(usedCoupon.getUsedAt())
-                .status(usedCoupon.getStatus())
-                .orderId(usedCoupon.getOrderId())
+                .issuedAt(userCoupon.getIssuedAt())
+                .expiredAt(userCoupon.getExpiredAt())
+                .usedAt(userCoupon.getUsedAt())
+                .status(userCoupon.getStatus())
+                .orderId(userCoupon.getOrderId())
                 .build();
     }
 }
