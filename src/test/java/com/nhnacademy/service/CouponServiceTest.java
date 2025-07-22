@@ -8,7 +8,7 @@ import com.nhnacademy.domain.enumtype.UserCouponStatus;
 import com.nhnacademy.dto.request.CouponPolicyRequestDto;
 import com.nhnacademy.exception.CouponNotFoundException;
 import com.nhnacademy.repository.CouponPolicyRepository;
-import com.nhnacademy.repository.UserCouponListRepository;
+import com.nhnacademy.repository.UserCouponListListRepository;
 import com.nhnacademy.service.impl.CouponServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -31,7 +31,7 @@ class CouponServiceTest {
     private CouponPolicyRepository couponPolicyRepository;
 
     @Mock
-    private UserCouponListRepository userCouponListRepository;
+    private UserCouponListListRepository userCouponListRepository;
 
     @InjectMocks
     private CouponServiceImpl couponService;

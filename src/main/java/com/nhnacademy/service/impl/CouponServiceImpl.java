@@ -14,7 +14,7 @@ import com.nhnacademy.dto.response.CouponPolicyResponseDto;
 import com.nhnacademy.repository.CouponBookRepository;
 import com.nhnacademy.repository.CouponCategoryRepository;
 import com.nhnacademy.repository.CouponPolicyRepository;
-import com.nhnacademy.repository.UserCouponListRepository;
+import com.nhnacademy.repository.UserCouponListListRepository;
 import com.nhnacademy.service.CouponService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
 public class CouponServiceImpl implements CouponService {
 
     private final CouponPolicyRepository couponPolicyRepository;
-    private final UserCouponListRepository userCouponListRepository;
+    private final UserCouponListListRepository userCouponListRepository;
     private final CouponBookRepository couponBookRepository;
     private final CouponCategoryRepository couponCategoryRepository;
     private final RabbitTemplate rabbitTemplate;
@@ -148,15 +148,15 @@ public class CouponServiceImpl implements CouponService {
     }
 
     public List<UserCouponList> getActiveUserCoupons(Long userNo) {
-        return userCouponListRepository.findActiveCouponsByUserIdAndPeriod(userNo, LocalDateTime.now().minusYears(100), LocalDateTime.now().plusYears(100));
+        return userCouponListRepository.findActiveCouponsByUserNo(userNo);
     }
 
     public List<UserCouponList> getUsedUserCoupons(Long userNo) {
-        return userCouponListRepository.findUsedCouponsByUserId(userNo);
+        return userCouponListRepository.findUsedCouponsByUserNo(userNo);
     }
 
     public List<UserCouponList> getExpiredUserCoupons(Long userNo) {
-        return userCouponListRepository.findExpiredCouponsByUserId(userNo);
+        return userCouponListRepository.findExpiredCouponsByUserNo(userNo);
     }
 
     public CouponPolicy getCouponPolicy(Long policyId) {

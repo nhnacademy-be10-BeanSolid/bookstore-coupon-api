@@ -2,12 +2,12 @@ package com.nhnacademy.repository;
 
 import com.nhnacademy.domain.CouponPolicy;
 import com.nhnacademy.domain.UserCouponList;
-import com.nhnacademy.repository.queryfactory.UserCouponRepositoryCustom;
+import com.nhnacademy.repository.queryfactory.UserCouponListRepositoryCustom;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 import java.util.Optional;
 
-public interface UserCouponListRepository extends JpaRepository<UserCouponList, Long>, UserCouponRepositoryCustom {
+public interface UserCouponListListRepository extends JpaRepository<UserCouponList, Long>, UserCouponListRepositoryCustom {
 
     //추후에 사용 예정
 //    List<UserCouponList> findByUserNo(Long userNo);

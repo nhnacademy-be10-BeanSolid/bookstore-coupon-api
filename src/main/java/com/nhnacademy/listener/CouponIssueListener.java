@@ -7,7 +7,7 @@ import com.nhnacademy.domain.CouponPolicy;
 import com.nhnacademy.domain.enumtype.UserCouponStatus;
 import com.nhnacademy.exception.CouponNotFoundException;
 import com.nhnacademy.repository.CouponPolicyRepository;
-import com.nhnacademy.repository.UserCouponListRepository;
+import com.nhnacademy.repository.UserCouponListListRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 public class CouponIssueListener {
 
     private final CouponPolicyRepository couponPolicyRepository;
-    private final UserCouponListRepository userCouponListRepository;
+    private final UserCouponListListRepository userCouponListRepository;
 
     @RabbitListener(queues = RabbitMQConfig.ISSUE_COUPONS_TO_USERS_QUEUE)
     @Transactional

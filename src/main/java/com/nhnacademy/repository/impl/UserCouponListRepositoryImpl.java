@@ -3,7 +3,7 @@ package com.nhnacademy.repository.impl;
 import com.nhnacademy.domain.QUserCouponList;
 import com.nhnacademy.domain.UserCouponList;
 import com.nhnacademy.domain.enumtype.UserCouponStatus;
-import com.nhnacademy.repository.queryfactory.UserCouponRepositoryCustom;
+import com.nhnacademy.repository.queryfactory.UserCouponListRepositoryCustom;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import org.springframework.stereotype.Repository;
@@ -12,16 +12,16 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
-public class UserCouponRepositoryImpl implements UserCouponRepositoryCustom {
+public class UserCouponListRepositoryImpl implements UserCouponListRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
 
-    public UserCouponRepositoryImpl(EntityManager entityManager) {
+    public UserCouponListRepositoryImpl(EntityManager entityManager) {
         this.queryFactory = new JPAQueryFactory(entityManager);
     }
 
     @Override
-    public List<UserCouponList> findActiveCouponsByUserIdAndPeriod(Long userNo, LocalDateTime startDate, LocalDateTime endDate) {
+    public List<UserCouponList> findActiveCouponsByUserNo(Long userNo) {
         QUserCouponList usedCoupon = QUserCouponList.userCouponList;
 
         return queryFactory
@@ -33,7 +33,7 @@ public class UserCouponRepositoryImpl implements UserCouponRepositoryCustom {
     }
 
     @Override
-    public List<UserCouponList> findUsedCouponsByUserId(Long userNo) {
+    public List<UserCouponList> findUsedCouponsByUserNo(Long userNo) {
         QUserCouponList usedCoupon = QUserCouponList.userCouponList;
 
         return queryFactory
@@ -44,7 +44,7 @@ public class UserCouponRepositoryImpl implements UserCouponRepositoryCustom {
     }
 
     @Override
-    public List<UserCouponList> findExpiredCouponsByUserId(Long userNo) {
+    public List<UserCouponList> findExpiredCouponsByUserNo(Long userNo) {
         QUserCouponList usedCoupon = QUserCouponList.userCouponList;
 
         return queryFactory
