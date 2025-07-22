@@ -1,5 +1,5 @@
 ### 쿠폰 등록
-POST http://localhost:10353/coupons/policy
+POST http://localhost:10352/coupons/policy
 Content-Type: application/json
 
 {
@@ -18,7 +18,7 @@ Content-Type: application/json
 
 
 ### 2번째 쿠폰 등록
-POST http://localhost:10353/coupons/policy
+POST http://localhost:10352/coupons/policy
 Content-Type: application/json
 
 {
@@ -36,7 +36,7 @@ Content-Type: application/json
 }
 
 ### 3번째 쿠폰 등록
-POST http://localhost:10353/coupons/policy
+POST http://localhost:10352/coupons/policy
 Content-Type: application/json
 
 {
@@ -88,7 +88,7 @@ Content-Type: application/json
 
 
 ### 생일 쿠폰 등록
-POST http://localhost:10353/coupons/policy
+POST http://localhost:10352/coupons/policy
 Content-Type: application/json
 
 {
@@ -135,9 +135,6 @@ Content-Type: application/json
 POST http://localhost:10352/coupons/users/9/issue-welcome
 Content-Type: application/json
 
-
-
-
 ### 사용자 활성 쿠폰 조회
 GET http://localhost:10352/coupons/users/1/active
 Content-Type: application/json
@@ -170,7 +167,7 @@ GET http://localhost:10352/coupons/users/1/calculate-discount/3?orderAmount=3000
 Content-Type: application/json
 
 ### 해리 포터와 불의 잔 2 도서 쿠폰 등록
-POST http://localhost:10353/coupons/policy
+POST http://localhost:10352/coupons/policy
 Content-Type: application/json
 
 {
@@ -187,12 +184,12 @@ Content-Type: application/json
 "categoryIds": null
 }
 ### 사용자 178에게 해리 포터와 불의 잔 2 도서 쿠폰 발급
-POST http://localhost:10353/coupons/users/178/issue/4
+POST http://localhost:10352/coupons/users/178/issue/4
 Content-Type: application/json
 
 
 ### 해리포터 및 흔한남매 대상 15% 할인 쿠폰 을 찾아 couponId 확인
-POST http://localhost:10353/coupons/policy
+POST http://localhost:10352/coupons/policy
 Content-Type: application/json
 
 {
