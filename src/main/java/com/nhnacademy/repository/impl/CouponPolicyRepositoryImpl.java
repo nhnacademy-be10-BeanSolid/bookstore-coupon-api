@@ -36,7 +36,7 @@ public class CouponPolicyRepositoryImpl implements CouponPolicyRepositoryCustom 
     @Override
     public List<CouponPolicy> findApplicableCouponPolicies(Long userNo, int orderAmount, List<Long> bookIdsInOrder, List<Long> categoryIdsInOrder) {
         QCouponPolicy policy = QCouponPolicy.couponPolicy;
-        QUserCoupon usedCoupon = QUserCoupon.userCoupon;
+        QUserCouponList userCouponList = QUserCouponList.userCouponList;
 
         BooleanExpression commonConditions = policy.couponMinimumOrderAmount.loe(orderAmount)
                 .and(policy.couponExpiredAt.after(LocalDateTime.now()));
@@ -65,10 +65,10 @@ public class CouponPolicyRepositoryImpl implements CouponPolicyRepositoryCustom 
         return queryFactory
                 .select(policy)
                 .from(policy)
-                .join(usedCoupon).on(usedCoupon.couponPolicy.eq(policy))
-                .where(usedCoupon.userNo.eq(userNo)
-                        .and(usedCoupon.status.eq(UserCouponStatus.ACTIVE))
-                        .and(usedCoupon.expiredAt.after(LocalDateTime.now()))
+                .join(userCouponList).on(userCouponList.couponPolicy.eq(policy))
+                .where(userCouponList.userNo.eq(userNo)
+                        .and(userCouponList.status.eq(UserCouponStatus.ACTIVE))
+                        .and(userCouponList.expiredAt.after(LocalDateTime.now()))
                         .and(commonConditions)
                         .and(scopeConditions)
                 )

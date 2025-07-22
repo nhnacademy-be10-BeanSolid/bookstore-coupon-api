@@ -8,7 +8,7 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "coupon")
+@Table(name = "coupons")
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -20,15 +20,15 @@ public class CouponPolicy {
     @Column(name = "coupon_id")
     private Long couponId;    //쿠폰 정책 식별자
 
-    @Column(name = "coupon_name", nullable = false, length = 255)
+    @Column(name = "coupon_name", nullable = false)
     private String couponName;  // 쿠폰 정책 이름
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "coupon_type", nullable = false, length = 20)
+    @Column(name = "coupon_type", nullable = false)
     private CouponType couponType; // 쿠폰 유형 (WELCOME, BIRTHDAY, GENERAL 등)
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "coupon_discount_type", nullable = false, length = 20)
+    @Column(name = "coupon_discount_type", nullable = false)
     private CouponDiscountType couponDiscountType; // 쿠폰 할인 유형
 
     @Column(name = "coupon_discount_amount", nullable = false)
@@ -41,7 +41,7 @@ public class CouponPolicy {
     private Integer couponMaximumDiscountAmount; // 쿠폰 최대 할인
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "coupon_scope", nullable = false, length = 30)
+    @Column(name = "coupon_scope", nullable = false)
     private CouponScope couponScope;  // 쿠폰 적용 범위
 
     @Column(name = "coupon_created_at", nullable = false)
