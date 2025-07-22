@@ -16,4 +16,6 @@ public interface CouponBookRepository extends JpaRepository<CouponBook, Long>,
 
     @Query("SELECT cb.bookId FROM CouponBook cb WHERE cb.couponId = :couponId")
     List<Long> findBookIdsByCouponId(@Param("couponId") Long couponId);
+
+    void deleteByCouponPolicy(com.nhnacademy.domain.CouponPolicy couponPolicy);
 }
