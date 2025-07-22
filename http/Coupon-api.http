@@ -208,3 +208,7 @@ Content-Type: application/json
     "couponType": "GENERAL",
     "couponCreatedAt": "2025-07-17 15:00:00"
 }
+
+### 쿠폰 정책
+GET localhost:10352/coupons/policy/12
+

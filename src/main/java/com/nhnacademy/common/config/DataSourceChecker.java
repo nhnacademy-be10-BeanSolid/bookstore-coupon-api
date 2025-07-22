@@ -1,4 +1,4 @@
-package com.nhnacademy.config;
+package com.nhnacademy.common.config;
 
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;

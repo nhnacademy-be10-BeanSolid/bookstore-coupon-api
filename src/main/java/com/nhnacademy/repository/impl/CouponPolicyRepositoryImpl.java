@@ -6,7 +6,7 @@ import com.nhnacademy.domain.QCouponCategory;
 import com.nhnacademy.domain.QCouponPolicy;
 import com.nhnacademy.domain.QUsedCoupon;
 import com.nhnacademy.domain.UserCouponStatus;
-import com.nhnacademy.repository.CouponPolicyRepositoryCustom;
+import com.nhnacademy.repository.queryfactory.CouponPolicyRepositoryCustom;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;

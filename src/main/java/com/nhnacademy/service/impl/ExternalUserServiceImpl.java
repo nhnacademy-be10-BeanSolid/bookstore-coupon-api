@@ -1,6 +1,6 @@
 package com.nhnacademy.service.impl;
 
-import com.nhnacademy.controller.dto.UserResponse;
+import com.nhnacademy.dto.response.UserResponse;
 import com.nhnacademy.service.ExternalUserService;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;

@@ -1,6 +1,6 @@
 package com.nhnacademy.listener;
 
-import com.nhnacademy.config.RabbitMQConfig;
+import com.nhnacademy.common.config.RabbitMQConfig;
 import com.nhnacademy.event.UserRegisteredEvent;
 import com.nhnacademy.service.CouponService;
 import lombok.RequiredArgsConstructor;

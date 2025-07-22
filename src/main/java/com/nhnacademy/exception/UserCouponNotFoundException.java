@@ -1,10 +1,8 @@
 package com.nhnacademy.exception;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import com.nhnacademy.common.exception.NotFoundException;
 
-@ResponseStatus(HttpStatus.NOT_FOUND)
-public class UserCouponNotFoundException extends RuntimeException {
+public class UserCouponNotFoundException extends NotFoundException {
     public UserCouponNotFoundException(String message) {
         super(message);
     }

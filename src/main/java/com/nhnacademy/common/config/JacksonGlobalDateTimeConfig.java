@@ -1,4 +1,4 @@
-package com.nhnacademy.config;
+package com.nhnacademy.common.config;
 
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;

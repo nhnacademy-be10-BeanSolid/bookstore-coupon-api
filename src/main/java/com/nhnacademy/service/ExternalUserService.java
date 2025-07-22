@@ -1,6 +1,6 @@
 package com.nhnacademy.service;
 
-import com.nhnacademy.controller.dto.UserResponse;
+import com.nhnacademy.dto.response.UserResponse;
 import java.util.List;
 
 public interface ExternalUserService {

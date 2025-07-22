@@ -1,8 +1,8 @@
 package com.nhnacademy.controller;
 
-import com.nhnacademy.controller.dto.CouponPolicyRequest;
-import com.nhnacademy.controller.dto.CouponUseRequest;
-import com.nhnacademy.controller.dto.UserCouponResponse;
+import com.nhnacademy.dto.request.CouponPolicyRequest;
+import com.nhnacademy.dto.request.CouponUseRequest;
+import com.nhnacademy.dto.response.UserCouponResponse;
 import com.nhnacademy.domain.CouponPolicy;
 import com.nhnacademy.domain.UsedCoupon;
 import com.nhnacademy.dto.CouponPolicyResponseDto;
