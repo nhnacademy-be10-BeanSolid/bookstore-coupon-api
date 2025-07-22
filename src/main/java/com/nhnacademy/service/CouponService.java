@@ -208,6 +208,14 @@ public class CouponService {
         return userCouponRepository.save(usedCoupon);
     }
 
+    public List<Long> getBookIdsByCouponId(Long couponId) {
+        return couponBookRepository.findBookIdsByCouponId(couponId);
+    }
+
+    public List<Long> getCategoryIdsByCouponId(Long couponId) {
+        return couponCategoryRepository.findCategoryIdsByCouponId(couponId);
+    }
+
     @Transactional
     public void useCoupon(Long userNo, Long userCouponId, Long orderId) {
         UsedCoupon usedCoupon = userCouponRepository.findByUserNoAndUserCouponId(userNo, userCouponId)
@@ -223,6 +231,15 @@ public class CouponService {
         usedCoupon.use();
         usedCoupon.setOrderId(orderId);
         userCouponRepository.save(usedCoupon);
+    }
+
+    @Transactional
+    public void deleteCouponPolicy(Long couponId) {
+        CouponPolicy policy = couponPolicyRepository.findById(couponId)
+                .orElseThrow(() -> new CouponNotFoundException("존재하지 않는 쿠폰 정책입니다. Policy ID: " + couponId));
+        couponBookRepository.deleteByCouponPolicy(policy); // 연결된 CouponBook 먼저 삭제
+        userCouponRepository.deleteByCouponPolicy(policy); // 연결된 UsedCoupon 먼저 삭제
+        couponPolicyRepository.delete(policy);
     }
 
     public Integer calculateDiscountAmount(Long userNo, Long userCouponId, int orderAmount, List<Long> bookIdsInOrder, List<Long> categoryIdsInOrder) {
