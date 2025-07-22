@@ -2,16 +2,19 @@ package com.nhnacademy.controller;
 
 import com.nhnacademy.dto.request.CouponPolicyRequest;
 import com.nhnacademy.dto.request.CouponUseRequest;
+import com.nhnacademy.dto.request.IssueBookCouponRequest;
 import com.nhnacademy.dto.response.UserCouponResponse;
 import com.nhnacademy.domain.CouponPolicy;
 import com.nhnacademy.domain.UserCoupon;
-import com.nhnacademy.dto.CouponPolicyResponseDto;
+import com.nhnacademy.dto.response.CouponPolicyResponseDto;
+import com.nhnacademy.exception.ValidationFailedException;
 import com.nhnacademy.service.CouponService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -26,20 +29,13 @@ public class CouponController {
     private final CouponService couponService;
 
     @PostMapping("/policy")
-    public ResponseEntity<CouponPolicy> createCouponPolicy(@Valid @RequestBody CouponPolicyRequest request) {
-        CouponPolicy newPolicy = couponService.createCouponPolicy(
-                request.getCouponName(),
-                request.getCouponDiscountType(),
-                request.getCouponDiscountAmount(),
-                request.getCouponMinimumOrderAmount(),
-                request.getCouponMaximumDiscountAmount(),
-                request.getCouponScope(),
-                request.getCouponExpiredAt(),
-                request.getCouponIssuePeriod(),
-                request.getBookIds(),
-                request.getCategoryIds(),
-                request.getCouponType()
-        );
+    public ResponseEntity<CouponPolicy> createCouponPolicy(@Valid @RequestBody CouponPolicyRequest request, BindingResult bindingResult) {
+
+        if(bindingResult.hasErrors()) {
+            throw new ValidationFailedException(bindingResult);
+        }
+
+        CouponPolicy newPolicy = couponService.createCouponPolicy(request);
         return new ResponseEntity<>(newPolicy, HttpStatus.CREATED);
     }
 
@@ -76,7 +72,7 @@ public class CouponController {
     }
 
     @PostMapping("/issue/book")
-    public ResponseEntity<UserCouponResponse> issueBookCoupon(@RequestBody com.nhnacademy.dto.IssueBookCouponRequest request) {
+    public ResponseEntity<UserCouponResponse> issueBookCoupon(@RequestBody IssueBookCouponRequest request) {
         UserCoupon issuedCoupon = couponService.issueBookCoupon(request);
         return new ResponseEntity<>(UserCouponResponse.from(issuedCoupon), HttpStatus.CREATED);
     }

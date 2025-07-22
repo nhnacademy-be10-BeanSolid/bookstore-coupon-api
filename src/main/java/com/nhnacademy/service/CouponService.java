@@ -2,9 +2,11 @@ package com.nhnacademy.service;
 
 import com.nhnacademy.common.config.RabbitMQConfig;
 import com.nhnacademy.common.exception.CouponAlreadyExistException;
+import com.nhnacademy.dto.request.CouponPolicyRequest;
+import com.nhnacademy.dto.request.IssueBookCouponRequest;
 import com.nhnacademy.exception.*;
 import com.nhnacademy.domain.*;
-import com.nhnacademy.dto.CouponPolicyResponseDto;
+import com.nhnacademy.dto.response.CouponPolicyResponseDto;
 import com.nhnacademy.repository.CouponBookRepository;
 import com.nhnacademy.repository.CouponCategoryRepository;
 import com.nhnacademy.repository.CouponPolicyRepository;
@@ -35,31 +37,28 @@ public class CouponService {
     private final RabbitTemplate rabbitTemplate;
 
     @Transactional
-    public CouponPolicy createCouponPolicy(String name, CouponDiscountType discountType, int discountAmount,
-                                           Integer minOrderAmount, Integer maxDiscountAmount,
-                                           CouponScope scope, LocalDateTime expiredAt, Integer issuePeriod,
-                                           List<Long> bookIds, List<Long> categoryIds, CouponType couponType) {
+    public CouponPolicy createCouponPolicy(CouponPolicyRequest request) {
         CouponPolicy policy = CouponPolicy.builder()
-                .couponName(name)
-                .couponDiscountType(discountType)
-                .couponDiscountAmount(discountAmount)
-                .couponMinimumOrderAmount(minOrderAmount)
-                .couponMaximumDiscountAmount(maxDiscountAmount)
-                .couponScope(scope)
-                .couponExpiredAt(expiredAt)
-                .couponIssuePeriod(issuePeriod)
-                .couponType(couponType)
+                .couponName(request.getCouponName())
+                .couponDiscountType(request.getCouponDiscountType())
+                .couponDiscountAmount(request.getCouponDiscountAmount())
+                .couponMinimumOrderAmount(request.getCouponMinimumOrderAmount())
+                .couponMaximumDiscountAmount(request.getCouponMaximumDiscountAmount())
+                .couponScope(request.getCouponScope())
+                .couponExpiredAt(request.getCouponExpiredAt())
+                .couponIssuePeriod(request.getCouponIssuePeriod())
+                .couponType(request.getCouponType())
                 .build();
         CouponPolicy savedPolicy = couponPolicyRepository.save(policy);
 
-        if (scope == CouponScope.BOOK && bookIds != null && !bookIds.isEmpty()) {
-            bookIds.forEach(bookId -> couponBookRepository.save(CouponBook.builder()
+        if (request.getCouponScope() == CouponScope.BOOK && request.getBookIds() != null && !request.getBookIds().isEmpty()) {
+            request.getBookIds().forEach(bookId -> couponBookRepository.save(CouponBook.builder()
                     .couponBookId(savedPolicy.getCouponId())
                     .bookId(bookId)
                     .couponPolicy(savedPolicy)
                     .build()));
-        } else if (scope == CouponScope.CATEGORY && categoryIds != null && !categoryIds.isEmpty()) {
-            categoryIds.forEach(categoryId -> couponCategoryRepository.save(CouponCategory.builder()
+        } else if (request.getCouponScope() == CouponScope.CATEGORY && request.getCategoryIds() != null && !request.getCategoryIds().isEmpty()) {
+            request.getCategoryIds().forEach(categoryId -> couponCategoryRepository.save(CouponCategory.builder()
                     .couponCategoryId(savedPolicy.getCouponId())
                     .categoryId(categoryId)
                     .couponPolicy(savedPolicy)
@@ -129,7 +128,7 @@ public class CouponService {
     }
 
     @Transactional
-    public UserCoupon issueBookCoupon(com.nhnacademy.dto.IssueBookCouponRequest request) {
+    public UserCoupon issueBookCoupon(IssueBookCouponRequest request) {
         CouponPolicy policy = couponPolicyRepository.findById(request.getCouponPolicyId())
                 .orElseThrow(() -> new CouponNotFoundException("존재하지 않는 쿠폰 정책입니다. Policy ID: " + request.getCouponPolicyId()));
 
@@ -273,7 +272,7 @@ public class CouponService {
             }
         }
 
-        int discount = 0;
+        int discount;
         if (policy.getCouponDiscountType() == CouponDiscountType.AMOUNT) {
             discount = policy.getCouponDiscountAmount();
         } else if (policy.getCouponDiscountType() == CouponDiscountType.PERCENT) {

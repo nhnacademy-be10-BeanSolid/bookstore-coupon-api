@@ -8,10 +8,9 @@ import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.data.repository.query.Param;
 import java.util.List;
 
-public interface CouponBookRepository extends JpaRepository<CouponBook, Long>,
-        QuerydslPredicateExecutor<CouponBook>,
-        CouponBookRepositoryCustom {
-    List<CouponBook> findByCouponId(Long couponId);
+public interface CouponBookRepository extends JpaRepository<CouponBook, Long>, QuerydslPredicateExecutor<CouponBook>, CouponBookRepositoryCustom {
+
+    List<CouponBook> findByCouponPolicy_CouponId(Long couponId);
 
     boolean existsByCouponPolicy_CouponIdAndBookId(Long couponPolicyId, Long bookId);
 

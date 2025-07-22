@@ -2,7 +2,7 @@ package com.nhnacademy.controller;
 
 import com.nhnacademy.domain.CouponPolicy;
 import com.nhnacademy.domain.CouponScope;
-import com.nhnacademy.dto.CouponPolicyResponseDto;
+import com.nhnacademy.dto.response.CouponPolicyResponseDto;
 import com.nhnacademy.dto.request.CouponPolicyRequest;
 import com.nhnacademy.service.CouponService;
 import lombok.RequiredArgsConstructor;
@@ -39,19 +39,7 @@ public class CouponAdminController {
 
     @PostMapping("/coupon-policies")
     public ResponseEntity<Void> createCouponPolicy(@RequestBody CouponPolicyRequest request) {
-        couponService.createCouponPolicy(
-                request.getCouponName(),
-                request.getCouponDiscountType(),
-                request.getCouponDiscountAmount(),
-                request.getCouponMinimumOrderAmount(),
-                request.getCouponMaximumDiscountAmount(),
-                request.getCouponScope(),
-                request.getCouponExpiredAt(),
-                request.getCouponIssuePeriod(),
-                request.getBookIds(),
-                request.getCategoryIds(),
-                request.getCouponType()
-        );
+        couponService.createCouponPolicy(request);
         return ResponseEntity.ok().build();
     }
 

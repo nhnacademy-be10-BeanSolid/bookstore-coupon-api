@@ -1,4 +1,4 @@
-package com.nhnacademy.dto;
+package com.nhnacademy.dto.response;
 
 import com.nhnacademy.domain.CouponDiscountType;
 import com.nhnacademy.domain.CouponScope;

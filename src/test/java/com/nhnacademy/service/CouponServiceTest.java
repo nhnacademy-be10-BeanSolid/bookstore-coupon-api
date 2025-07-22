@@ -1,6 +1,7 @@
 package com.nhnacademy.service;
 
 import com.nhnacademy.domain.*;
+import com.nhnacademy.dto.request.CouponPolicyRequest;
 import com.nhnacademy.exception.CouponNotFoundException;
 import com.nhnacademy.repository.CouponPolicyRepository;
 import com.nhnacademy.repository.UserCouponRepository;
@@ -40,7 +41,21 @@ class CouponServiceTest {
     void testCreateCouponPolicy() {
         when(couponPolicyRepository.save(any(CouponPolicy.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        CouponPolicy result = couponService.createCouponPolicy("Welcome Coupon", CouponDiscountType.PERCENT, 10, 20000, 5000, CouponScope.ALL, null, 365, null, null, CouponType.WELCOME);
+        CouponPolicyRequest couponPolicyRequest = new CouponPolicyRequest(
+                "Welcome Coupon",
+                CouponDiscountType.PERCENT,
+                10,
+                20000,
+                5000,
+                CouponScope.ALL,
+                null,
+                365,
+                CouponType.WELCOME,
+                null,
+                null
+        );
+
+        CouponPolicy result = couponService.createCouponPolicy(couponPolicyRequest);
 
         assertThat(result).isNotNull();
         assertThat(result.getCouponName()).isEqualTo("Welcome Coupon");

@@ -1,4 +1,4 @@
-package com.nhnacademy.dto;
+package com.nhnacademy.dto.request;
 
 import lombok.Getter;
 import lombok.Setter;

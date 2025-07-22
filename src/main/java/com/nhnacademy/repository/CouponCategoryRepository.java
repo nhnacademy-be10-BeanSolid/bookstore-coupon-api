@@ -11,7 +11,7 @@ import java.util.List;
 public interface CouponCategoryRepository extends JpaRepository<CouponCategory, Long>,
         QuerydslPredicateExecutor<CouponCategory>,
         CouponCategoryRepositoryCustom {
-    List<CouponCategory> findByCouponId(Long couponId);
+    List<CouponCategory> findByCouponPolicy_CouponId(Long couponId);
 
     @Query("SELECT cc.categoryId FROM CouponCategory cc WHERE cc.couponPolicy.couponId = :couponId")
     List<Long> findCategoryIdsByCouponId(@Param("couponId") Long couponId);
