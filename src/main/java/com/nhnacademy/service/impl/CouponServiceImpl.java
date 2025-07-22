@@ -63,7 +63,6 @@ public class CouponServiceImpl implements CouponService {
                     .build()));
         } else if (request.getCouponScope() == CouponScope.CATEGORY && request.getCategoryIds() != null && !request.getCategoryIds().isEmpty()) {
             request.getCategoryIds().forEach(categoryId -> couponCategoryRepository.save(CouponCategory.builder()
-                    .couponCategoryId(savedPolicy.getCouponId())
                     .categoryId(categoryId)
                     .couponPolicy(savedPolicy)
                     .build()));
