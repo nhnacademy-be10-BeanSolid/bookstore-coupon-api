@@ -6,7 +6,7 @@ import com.nhnacademy.domain.QCouponCategory;
 import com.nhnacademy.domain.QCouponPolicy;
 import com.nhnacademy.domain.QUsedCoupon;
 import com.nhnacademy.domain.UserCouponStatus;
-import com.nhnacademy.repository.CouponPolicyRepositoryCustom;
+import com.nhnacademy.repository.queryfactory.CouponPolicyRepositoryCustom;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
@@ -38,7 +38,7 @@ public class CouponPolicyRepositoryImpl implements CouponPolicyRepositoryCustom 
     }
 
     @Override
-    public List<CouponPolicy> findApplicableCouponPolicies(String userNo, int orderAmount, List<Long> bookIdsInOrder, List<Long> categoryIdsInOrder) {
+    public List<CouponPolicy> findApplicableCouponPolicies(Long userNo, int orderAmount, List<Long> bookIdsInOrder, List<Long> categoryIdsInOrder) {
         QCouponPolicy policy = QCouponPolicy.couponPolicy;
         QUsedCoupon usedCoupon = QUsedCoupon.usedCoupon;
 

@@ -1,15 +1,15 @@
 ### 쿠폰 등록
-POST http://localhost:10352/coupons/policy
+POST http://localhost:10353/coupons/policy
 Content-Type: application/json
 
 {
-  "couponName": "가입 축하 10% 할인 (최대 5천원)",
+  "couponName": "가입 축하 Welcome 쿠폰 최대 10,000원 할인",
   "couponDiscountType": "PERCENT",
   "couponDiscountAmount": 10,
   "couponMinimumOrderAmount": 50000,
   "couponMaximumDiscountAmount": 10000,
   "couponScope": "ALL",
-  "couponExpiredAt": "2025-12-31T23:59:59",
+  "couponExpiredAt": "2025-12-31 23:59:59",
   "couponIssuePeriod": null,
   "bookIds": [],
   "categoryIds": [],
@@ -18,7 +18,7 @@ Content-Type: application/json
 
 
 ### 2번째 쿠폰 등록
-POST http://localhost:10352/coupons/policy
+POST http://localhost:10353/coupons/policy
 Content-Type: application/json
 
 {
@@ -28,7 +28,7 @@ Content-Type: application/json
   "couponMinimumOrderAmount": 20000,
   "couponMaximumDiscountAmount": null,
   "couponScope": "ALL",
-  "couponExpiredAt": "2025-12-31T23:59:59",
+  "couponExpiredAt": "2025-12-31 23:59:59",
   "couponIssuePeriod": null,
   "bookIds": [],
   "categoryIds": [],
@@ -36,7 +36,7 @@ Content-Type: application/json
 }
 
 ### 3번째 쿠폰 등록
-POST http://localhost:10352/coupons/policy
+POST http://localhost:10353/coupons/policy
 Content-Type: application/json
 
 {
@@ -46,7 +46,7 @@ Content-Type: application/json
   "couponMinimumOrderAmount": 50000,
   "couponMaximumDiscountAmount": null,
   "couponScope": "ALL",
-  "couponExpiredAt": "2025-12-31T23:59:59",
+  "couponExpiredAt": "2025-12-31 23:59:59",
   "couponIssuePeriod": 30,
   "bookIds": [],
   "categoryIds": []
@@ -63,7 +63,7 @@ Content-Type: application/json
   "couponMinimumOrderAmount": 15000,
   "couponMaximumDiscountAmount": null,
   "couponScope": "BOOK",
-  "couponExpiredAt": "2025-12-31T23:59:59",
+  "couponExpiredAt": "2025-12-31 23:59:59",
   "couponIssuePeriod": null,
   "bookIds": [10, 25, 30],
   "categoryIds": []
@@ -80,7 +80,7 @@ Content-Type: application/json
   "couponMinimumOrderAmount": 15000,
   "couponMaximumDiscountAmount": null,
   "couponScope": "CATEGORY",
-  "couponExpiredAt": "2025-12-31T23:59:59",
+  "couponExpiredAt": "2025-12-31 23:59:59",
   "couponIssuePeriod": null,
   "bookIds": [],
   "categoryIds": [1, 2, 3]
@@ -88,7 +88,7 @@ Content-Type: application/json
 
 
 ### 생일 쿠폰 등록
-POST http://localhost:10352/coupons/policy
+POST http://localhost:10353/coupons/policy
 Content-Type: application/json
 
 {
@@ -170,7 +170,7 @@ GET http://localhost:10352/coupons/users/1/calculate-discount/3?orderAmount=3000
 Content-Type: application/json
 
 ### 해리 포터와 불의 잔 2 도서 쿠폰 등록
-POST http://localhost:10352/coupons/policy
+POST http://localhost:10353/coupons/policy
 Content-Type: application/json
 
 {
@@ -180,19 +180,19 @@ Content-Type: application/json
 "couponMinimumOrderAmount": 10000,
 "couponMaximumDiscountAmount": 7000,
 "couponScope": "BOOK",
-"couponExpiredAt": "2025-12-31T23:59:59",
+"couponExpiredAt": "2025-12-31 23:59:59",
 "couponIssuePeriod": null,
 "couponType": "GENERAL",
 "bookIds": [0, 1],
 "categoryIds": null
 }
 ### 사용자 178에게 해리 포터와 불의 잔 2 도서 쿠폰 발급
-POST http://localhost:10352/coupons/users/178/issue/4
+POST http://localhost:10353/coupons/users/178/issue/4
 Content-Type: application/json
 
 
 ### 해리포터 및 흔한남매 대상 15% 할인 쿠폰 을 찾아 couponId 확인
-POST http://localhost:10352/coupons/policy
+POST http://localhost:10353/coupons/policy
 Content-Type: application/json
 
 {
@@ -203,8 +203,12 @@ Content-Type: application/json
     "couponMinimumOrderAmount": 10000,
     "couponMaximumDiscountAmount": 7000,
     "couponScope": "BOOK",
-    "couponExpiredAt": "2025-12-31T23:59:59",
+    "couponExpiredAt": "2025-12-31 23:59:59",
     "couponIssuePeriod": null,
     "couponType": "GENERAL",
-    "couponCreatedAt": "2025-07-17T15:00:00",
+    "couponCreatedAt": "2025-07-17 15:00:00"
 }
+
+### 쿠폰 정책
+GET localhost:10352/coupons/policy/12
+
