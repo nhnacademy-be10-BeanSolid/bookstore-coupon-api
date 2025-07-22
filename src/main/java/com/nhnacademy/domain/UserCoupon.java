@@ -1,5 +1,6 @@
 package com.nhnacademy.domain;
 
+import com.nhnacademy.domain.enumtype.UserCouponStatus;
 import lombok.*;
 import jakarta.persistence.*;
 

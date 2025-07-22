@@ -1,6 +1,9 @@
 package com.nhnacademy.repository.impl;
 
 import com.nhnacademy.domain.*;
+import com.nhnacademy.domain.enumtype.CouponScope;
+import com.nhnacademy.domain.enumtype.CouponType;
+import com.nhnacademy.domain.enumtype.UserCouponStatus;
 import com.nhnacademy.repository.queryfactory.CouponPolicyRepositoryCustom;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;

@@ -2,7 +2,7 @@ package com.nhnacademy.repository.impl;
 
 import com.nhnacademy.domain.QUserCoupon;
 import com.nhnacademy.domain.UserCoupon;
-import com.nhnacademy.domain.UserCouponStatus;
+import com.nhnacademy.domain.enumtype.UserCouponStatus;
 import com.nhnacademy.repository.queryfactory.UserCouponRepositoryCustom;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;

@@ -1,5 +1,6 @@
 package com.nhnacademy.controller;
 
+import com.nhnacademy.common.exception.ValidationFailedException;
 import com.nhnacademy.dto.request.CouponPolicyRequest;
 import com.nhnacademy.dto.request.CouponUseRequest;
 import com.nhnacademy.dto.request.IssueBookCouponRequest;
@@ -7,7 +8,6 @@ import com.nhnacademy.dto.response.UserCouponResponse;
 import com.nhnacademy.domain.CouponPolicy;
 import com.nhnacademy.domain.UserCoupon;
 import com.nhnacademy.dto.response.CouponPolicyResponseDto;
-import com.nhnacademy.exception.ValidationFailedException;
 import com.nhnacademy.service.CouponService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

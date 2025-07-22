@@ -1,5 +1,8 @@
 package com.nhnacademy.domain;
 
+import com.nhnacademy.domain.enumtype.CouponDiscountType;
+import com.nhnacademy.domain.enumtype.CouponScope;
+import com.nhnacademy.domain.enumtype.CouponType;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;

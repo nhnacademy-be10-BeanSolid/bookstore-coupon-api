@@ -1,10 +1,10 @@
 package com.nhnacademy.controller;
 
+import com.nhnacademy.common.exception.ValidationFailedException;
 import com.nhnacademy.domain.CouponPolicy;
-import com.nhnacademy.domain.CouponScope;
+import com.nhnacademy.domain.enumtype.CouponScope;
 import com.nhnacademy.dto.response.CouponPolicyResponseDto;
 import com.nhnacademy.dto.request.CouponPolicyRequest;
-import com.nhnacademy.exception.ValidationFailedException;
 import com.nhnacademy.service.CouponService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

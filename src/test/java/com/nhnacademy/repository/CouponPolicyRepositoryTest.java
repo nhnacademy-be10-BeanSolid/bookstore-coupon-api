@@ -1,9 +1,9 @@
 package com.nhnacademy.repository;
 
-import com.nhnacademy.domain.CouponDiscountType;
+import com.nhnacademy.domain.enumtype.CouponDiscountType;
 import com.nhnacademy.domain.CouponPolicy;
-import com.nhnacademy.domain.CouponScope;
-import com.nhnacademy.domain.CouponType;
+import com.nhnacademy.domain.enumtype.CouponScope;
+import com.nhnacademy.domain.enumtype.CouponType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

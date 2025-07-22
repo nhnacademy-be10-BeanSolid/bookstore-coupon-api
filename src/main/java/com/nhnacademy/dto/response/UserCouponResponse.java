@@ -1,7 +1,7 @@
 package com.nhnacademy.dto.response;
 
 import com.nhnacademy.domain.UserCoupon;
-import com.nhnacademy.domain.UserCouponStatus;
+import com.nhnacademy.domain.enumtype.UserCouponStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

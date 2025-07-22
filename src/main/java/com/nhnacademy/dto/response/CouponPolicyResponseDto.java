@@ -1,8 +1,8 @@
 package com.nhnacademy.dto.response;
 
-import com.nhnacademy.domain.CouponDiscountType;
-import com.nhnacademy.domain.CouponScope;
-import com.nhnacademy.domain.CouponType;
+import com.nhnacademy.domain.enumtype.CouponDiscountType;
+import com.nhnacademy.domain.enumtype.CouponScope;
+import com.nhnacademy.domain.enumtype.CouponType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

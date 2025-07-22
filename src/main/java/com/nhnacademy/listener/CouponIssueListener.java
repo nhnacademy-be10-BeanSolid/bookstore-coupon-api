@@ -4,7 +4,7 @@ import com.nhnacademy.common.config.RabbitMQConfig;
 import com.nhnacademy.dto.request.IssueCouponsToUsersRequest;
 import com.nhnacademy.domain.CouponPolicy;
 import com.nhnacademy.domain.UserCoupon;
-import com.nhnacademy.domain.UserCouponStatus;
+import com.nhnacademy.domain.enumtype.UserCouponStatus;
 import com.nhnacademy.exception.CouponNotFoundException;
 import com.nhnacademy.repository.CouponPolicyRepository;
 import com.nhnacademy.repository.UserCouponRepository;
