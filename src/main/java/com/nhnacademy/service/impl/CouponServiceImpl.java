@@ -155,9 +155,7 @@ public class CouponServiceImpl implements CouponService {
         return userCouponListRepository.findUsedCouponsByUserNo(userNo);
     }
 
-    public List<UserCouponList> getExpiredUserCoupons(Long userNo) {
-        return userCouponListRepository.findExpiredCouponsByUserNo(userNo);
-    }
+    
 
     public CouponPolicy getCouponPolicy(Long policyId) {
         return couponPolicyRepository.findById(policyId)

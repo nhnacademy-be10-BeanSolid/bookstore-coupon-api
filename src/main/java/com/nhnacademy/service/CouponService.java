@@ -26,7 +26,7 @@ public interface CouponService {
 
     List<UserCouponList> getUsedUserCoupons(Long userNo);
 
-    List<UserCouponList> getExpiredUserCoupons(Long userNo);
+    
 
     CouponPolicy getCouponPolicy(Long policyId);
 

@@ -100,7 +100,7 @@ Content-Type: application/json
   "couponMinimumOrderAmount": 10000,
   "couponMaximumDiscountAmount": 10000,
   "couponScope": "ALL",
-  "couponExpiredAt": null,
+  "couponExpiredAt": "2025-12-31 23:59:59",
   "couponIssuePeriod": 30,
   "bookIds": [],
   "categoryIds": [],
@@ -108,22 +108,6 @@ Content-Type: application/json
 
 }
 
-### 웰컴 쿠폰 정책 등록
-POST http://localhost:10352/coupons/policy
-Content-Type: application/json
-
-{
-  "couponName": "Welcome Coupon",
-  "couponDiscountType": "PERCENT",
-  "couponDiscountAmount": 10,
-  "couponMinimumOrderAmount": 5000,
-  "couponMaximumDiscountAmount": 5000,
-  "couponScope": "ALL",
-  "couponExpiredAt": null,
-  "couponIssuePeriod": 30,
-  "bookIds": [],
-  "categoryIds": []
-}
 
 ### 사용자에게 쿠폰 발급
 POST http://localhost:10352/coupons/users/11/issue/1
