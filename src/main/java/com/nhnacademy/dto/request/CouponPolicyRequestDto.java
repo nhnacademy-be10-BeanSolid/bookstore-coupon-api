@@ -15,7 +15,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CouponPolicyRequest {
+public class CouponPolicyRequestDto {
     @NotBlank
     private String couponName;
 

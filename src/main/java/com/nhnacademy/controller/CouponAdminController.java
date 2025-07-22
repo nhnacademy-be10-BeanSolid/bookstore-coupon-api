@@ -4,7 +4,7 @@ import com.nhnacademy.common.exception.ValidationFailedException;
 import com.nhnacademy.domain.CouponPolicy;
 import com.nhnacademy.domain.enumtype.CouponScope;
 import com.nhnacademy.dto.response.CouponPolicyResponseDto;
-import com.nhnacademy.dto.request.CouponPolicyRequest;
+import com.nhnacademy.dto.request.CouponPolicyRequestDto;
 import com.nhnacademy.service.CouponService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -41,7 +41,7 @@ public class CouponAdminController {
     }
 
     @PostMapping("/coupon-policies")
-    public ResponseEntity<Void> createCouponPolicy(@Valid @RequestBody CouponPolicyRequest request, BindingResult bindingResult) {
+    public ResponseEntity<Void> createCouponPolicy(@Valid @RequestBody CouponPolicyRequestDto request, BindingResult bindingResult) {
 
         if(bindingResult.hasErrors()) {
             throw new ValidationFailedException(bindingResult);

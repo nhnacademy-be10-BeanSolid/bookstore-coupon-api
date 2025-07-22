@@ -6,8 +6,8 @@ import com.nhnacademy.domain.enumtype.CouponDiscountType;
 import com.nhnacademy.domain.enumtype.CouponScope;
 import com.nhnacademy.domain.enumtype.CouponType;
 import com.nhnacademy.domain.enumtype.UserCouponStatus;
-import com.nhnacademy.dto.request.CouponPolicyRequest;
-import com.nhnacademy.dto.request.IssueBookCouponRequest;
+import com.nhnacademy.dto.request.CouponPolicyRequestDto;
+import com.nhnacademy.dto.request.IssueBookCouponRequestDto;
 import com.nhnacademy.exception.*;
 import com.nhnacademy.domain.*;
 import com.nhnacademy.dto.response.CouponPolicyResponseDto;
@@ -42,7 +42,7 @@ public class CouponServiceImpl implements CouponService {
     private final RabbitTemplate rabbitTemplate;
 
     @Transactional
-    public CouponPolicy createCouponPolicy(CouponPolicyRequest request) {
+    public CouponPolicy createCouponPolicy(CouponPolicyRequestDto request) {
         CouponPolicy policy = CouponPolicy.builder()
                 .couponName(request.getCouponName())
                 .couponDiscountType(request.getCouponDiscountType())
@@ -104,7 +104,7 @@ public class CouponServiceImpl implements CouponService {
     }
 
     @Transactional
-    public UserCoupon issueCouponToUser(Long userNo, Long couponPolicyId) {
+    public UserCouponList issueCouponToUser(Long userNo, Long couponPolicyId) {
         CouponPolicy policy = couponPolicyRepository.findById(couponPolicyId)
                 .orElseThrow(() -> new CouponNotFoundException("존재하지 않는 쿠폰 정책입니다. Policy ID: " + couponPolicyId));
 
@@ -121,7 +121,7 @@ public class CouponServiceImpl implements CouponService {
             userCouponExpiredAt = LocalDateTime.now().plusDays(365);
         }
 
-        UserCoupon userCoupon = UserCoupon.builder()
+        UserCouponList userCoupon = UserCouponList.builder()
                 .userNo(userNo)
                 .couponPolicy(policy)
                 .issuedAt(LocalDateTime.now())
@@ -133,7 +133,7 @@ public class CouponServiceImpl implements CouponService {
     }
 
     @Transactional
-    public UserCoupon issueBookCoupon(IssueBookCouponRequest request) {
+    public UserCouponList issueBookCoupon(IssueBookCouponRequestDto request) {
         CouponPolicy policy = couponPolicyRepository.findById(request.getCouponPolicyId())
                 .orElseThrow(() -> new CouponNotFoundException("존재하지 않는 쿠폰 정책입니다. Policy ID: " + request.getCouponPolicyId()));
 
@@ -149,15 +149,15 @@ public class CouponServiceImpl implements CouponService {
         return issueCouponToUser(request.getUserId(), request.getCouponPolicyId());
     }
 
-    public List<UserCoupon> getActiveUserCoupons(Long userNo) {
+    public List<UserCouponList> getActiveUserCoupons(Long userNo) {
         return userCouponRepository.findActiveCouponsByUserIdAndPeriod(userNo, LocalDateTime.now().minusYears(100), LocalDateTime.now().plusYears(100));
     }
 
-    public List<UserCoupon> getUsedUserCoupons(Long userNo) {
+    public List<UserCouponList> getUsedUserCoupons(Long userNo) {
         return userCouponRepository.findUsedCouponsByUserId(userNo);
     }
 
-    public List<UserCoupon> getExpiredUserCoupons(Long userNo) {
+    public List<UserCouponList> getExpiredUserCoupons(Long userNo) {
         return userCouponRepository.findExpiredCouponsByUserId(userNo);
     }
 
@@ -167,11 +167,11 @@ public class CouponServiceImpl implements CouponService {
     }
 
     @Transactional
-    public UserCoupon issueWelcomeCoupon(Long userNo) {
+    public UserCouponList issueWelcomeCoupon(Long userNo) {
         log.info("Attempting to find welcome coupon policy by type: WELCOME");
         CouponPolicy welcomePolicy = couponPolicyRepository.findByCouponType(CouponType.WELCOME)
                 .orElseThrow(() -> new WelcomeCouponPolicyNotFoundException("Welcome 쿠폰 정책을 찾을 수 없습니다."));
-        List<UserCoupon> existingWelcomeCoupons = userCouponRepository.findByUserNoAndCouponPolicy(userNo, welcomePolicy);
+        List<UserCouponList> existingWelcomeCoupons = userCouponRepository.findByUserNoAndCouponPolicy(userNo, welcomePolicy);
 
         if (!existingWelcomeCoupons.isEmpty()) {
             throw new CouponAlreadyExistException(String.format("사용자 ID: %s에게 웰컴 쿠폰이 이미 발급되었습니다.", userNo));
@@ -180,7 +180,7 @@ public class CouponServiceImpl implements CouponService {
     }
 
     @Transactional
-    public UserCoupon issueBirthdayCoupon(Long userNo, LocalDate userBirth) {
+    public UserCouponList issueBirthdayCoupon(Long userNo, LocalDate userBirth) {
         log.info("Attempting to find birthday coupon policy by type: BIRTHDAY");
         CouponPolicy birthdayPolicy = couponPolicyRepository.findByCouponType(CouponType.BIRTHDAY)
                 .orElseThrow(() -> new CouponNotFoundException("Birthday 쿠폰 정책을 찾을 수 없습니다."));
@@ -202,7 +202,7 @@ public class CouponServiceImpl implements CouponService {
         if (expiredAtCandidate.isBefore(now)) {
             expiredAtCandidate = expiredAtCandidate.plusYears(1);
         }
-        UserCoupon userCoupon = UserCoupon.builder()
+        UserCouponList userCoupon = UserCouponList.builder()
                 .userNo(userNo)
                 .couponPolicy(birthdayPolicy)
                 .issuedAt(now)
@@ -223,7 +223,7 @@ public class CouponServiceImpl implements CouponService {
 
     @Transactional
     public void useCoupon(Long userNo, Long userCouponId, Long orderId) {
-        UserCoupon userCoupon = userCouponRepository.findByUserNoAndUserCouponId(userNo, userCouponId)
+        UserCouponList userCoupon = userCouponRepository.findByUserNoAndUserCouponId(userNo, userCouponId)
                 .orElseThrow(() -> new UserCouponNotFoundException("쿠폰을 찾을 수 없습니다. UserCoupon ID: " + userCouponId + " 또는 사용자 ID: " + userNo + "와 일치하지 않습니다."));
 
         if (userCoupon.getStatus() == UserCouponStatus.USED) {
@@ -248,7 +248,7 @@ public class CouponServiceImpl implements CouponService {
     }
 
     public Integer calculateDiscountAmount(Long userNo, Long userCouponId, int orderAmount, List<Long> bookIdsInOrder, List<Long> categoryIdsInOrder) {
-        UserCoupon userCoupon = userCouponRepository.findByUserNoAndUserCouponId(userNo, userCouponId)
+        UserCouponList userCoupon = userCouponRepository.findByUserNoAndUserCouponId(userNo, userCouponId)
                 .orElseThrow(() -> new UserCouponNotFoundException("쿠폰을 찾을 수 없습니다. UserCoupon ID: " + userCouponId + " 또는 사용자 ID: " + userNo + "와 일치하지 않습니다."));
 
         if (userCoupon.getStatus() != UserCouponStatus.ACTIVE) {

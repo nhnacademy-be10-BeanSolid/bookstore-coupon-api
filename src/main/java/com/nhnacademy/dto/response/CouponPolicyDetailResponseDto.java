@@ -13,7 +13,7 @@ import java.util.List;
 @Getter
 @Builder
 @AllArgsConstructor
-public class CouponPolicyDetailResponse {
+public class CouponPolicyDetailResponseDto {
     private Long couponId;
     private String couponName;
     private CouponDiscountType couponDiscountType;
@@ -26,8 +26,8 @@ public class CouponPolicyDetailResponse {
     private List<Long> bookIds;
     private List<Long> categoryIds;
 
-    public static CouponPolicyDetailResponse from(CouponPolicy policy, List<Long> bookIds, List<Long> categoryIds) {
-        return CouponPolicyDetailResponse.builder()
+    public static CouponPolicyDetailResponseDto from(CouponPolicy policy, List<Long> bookIds, List<Long> categoryIds) {
+        return CouponPolicyDetailResponseDto.builder()
                 .couponId(policy.getCouponId())   // 쿠폰 식별자
                 .couponName(policy.getCouponName())  // 쿠폰 이름
                 .couponDiscountType(policy.getCouponDiscountType()) // 쿠폰 할인 유형

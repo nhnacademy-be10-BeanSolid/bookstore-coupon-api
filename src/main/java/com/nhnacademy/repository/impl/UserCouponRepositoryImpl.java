@@ -1,7 +1,7 @@
 package com.nhnacademy.repository.impl;
 
-import com.nhnacademy.domain.QUserCoupon;
-import com.nhnacademy.domain.UserCoupon;
+import com.nhnacademy.domain.QUserCouponList;
+import com.nhnacademy.domain.UserCouponList;
 import com.nhnacademy.domain.enumtype.UserCouponStatus;
 import com.nhnacademy.repository.queryfactory.UserCouponRepositoryCustom;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -21,8 +21,8 @@ public class UserCouponRepositoryImpl implements UserCouponRepositoryCustom {
     }
 
     @Override
-    public List<UserCoupon> findActiveCouponsByUserIdAndPeriod(Long userNo, LocalDateTime startDate, LocalDateTime endDate) {
-        QUserCoupon usedCoupon = QUserCoupon.userCoupon;
+    public List<UserCouponList> findActiveCouponsByUserIdAndPeriod(Long userNo, LocalDateTime startDate, LocalDateTime endDate) {
+        QUserCouponList usedCoupon = QUserCouponList.userCouponList;
 
         return queryFactory
                 .selectFrom(usedCoupon)
@@ -33,8 +33,8 @@ public class UserCouponRepositoryImpl implements UserCouponRepositoryCustom {
     }
 
     @Override
-    public List<UserCoupon> findUsedCouponsByUserId(Long userNo) {
-        QUserCoupon usedCoupon = QUserCoupon.userCoupon;
+    public List<UserCouponList> findUsedCouponsByUserId(Long userNo) {
+        QUserCouponList usedCoupon = QUserCouponList.userCouponList;
 
         return queryFactory
                 .selectFrom(usedCoupon)
@@ -44,8 +44,8 @@ public class UserCouponRepositoryImpl implements UserCouponRepositoryCustom {
     }
 
     @Override
-    public List<UserCoupon> findExpiredCouponsByUserId(Long userNo) {
-        QUserCoupon usedCoupon = QUserCoupon.userCoupon;
+    public List<UserCouponList> findExpiredCouponsByUserId(Long userNo) {
+        QUserCouponList usedCoupon = QUserCouponList.userCouponList;
 
         return queryFactory
                 .selectFrom(usedCoupon)

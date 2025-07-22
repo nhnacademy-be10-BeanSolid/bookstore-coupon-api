@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class IssueBookCouponRequest {
+public class IssueBookCouponRequestDto {
     private Long userId;
     private Long bookId;
     private Long couponPolicyId;

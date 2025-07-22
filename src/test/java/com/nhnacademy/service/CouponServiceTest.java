@@ -5,7 +5,7 @@ import com.nhnacademy.domain.enumtype.CouponDiscountType;
 import com.nhnacademy.domain.enumtype.CouponScope;
 import com.nhnacademy.domain.enumtype.CouponType;
 import com.nhnacademy.domain.enumtype.UserCouponStatus;
-import com.nhnacademy.dto.request.CouponPolicyRequest;
+import com.nhnacademy.dto.request.CouponPolicyRequestDto;
 import com.nhnacademy.exception.CouponNotFoundException;
 import com.nhnacademy.repository.CouponPolicyRepository;
 import com.nhnacademy.repository.UserCouponRepository;
@@ -46,7 +46,7 @@ class CouponServiceTest {
     void testCreateCouponPolicy() {
         when(couponPolicyRepository.save(any(CouponPolicy.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        CouponPolicyRequest couponPolicyRequest = new CouponPolicyRequest(
+        CouponPolicyRequestDto couponPolicyRequestDto = new CouponPolicyRequestDto(
                 "Welcome Coupon",
                 CouponDiscountType.PERCENT,
                 10,
@@ -60,7 +60,7 @@ class CouponServiceTest {
                 null
         );
 
-        CouponPolicy result = couponService.createCouponPolicy(couponPolicyRequest);
+        CouponPolicy result = couponService.createCouponPolicy(couponPolicyRequestDto);
 
         assertThat(result).isNotNull();
         assertThat(result.getCouponName()).isEqualTo("Welcome Coupon");
@@ -75,15 +75,15 @@ class CouponServiceTest {
                 .couponIssuePeriod(30)
                 .build();
         when(couponPolicyRepository.findById(anyLong())).thenReturn(Optional.of(policy));
-        when(userCouponRepository.save(any(UserCoupon.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(userCouponRepository.save(any(UserCouponList.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        UserCoupon result = couponService.issueCouponToUser(100L, 1L);
+        UserCouponList result = couponService.issueCouponToUser(100L, 1L);
 
         assertThat(result).isNotNull();
         assertThat(result.getUserNo()).isEqualTo(100L);
         assertThat(result.getStatus()).isEqualTo(UserCouponStatus.ACTIVE);
         verify(couponPolicyRepository, times(1)).findById(1L);
-        verify(userCouponRepository, times(1)).save(any(UserCoupon.class));
+        verify(userCouponRepository, times(1)).save(any(UserCouponList.class));
     }
 
     @Test

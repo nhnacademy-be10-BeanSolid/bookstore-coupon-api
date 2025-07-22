@@ -9,6 +9,6 @@ import lombok.AllArgsConstructor;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class CouponUseRequest {
+public class CouponUseRequestDto {
     private Long orderId;
 }

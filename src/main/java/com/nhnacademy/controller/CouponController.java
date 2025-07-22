@@ -1,12 +1,12 @@
 package com.nhnacademy.controller;
 
 import com.nhnacademy.common.exception.ValidationFailedException;
-import com.nhnacademy.dto.request.CouponPolicyRequest;
-import com.nhnacademy.dto.request.CouponUseRequest;
-import com.nhnacademy.dto.request.IssueBookCouponRequest;
-import com.nhnacademy.dto.response.UserCouponResponse;
+import com.nhnacademy.domain.UserCouponList;
+import com.nhnacademy.dto.request.CouponPolicyRequestDto;
+import com.nhnacademy.dto.request.CouponUseRequestDto;
+import com.nhnacademy.dto.request.IssueBookCouponRequestDto;
+import com.nhnacademy.dto.response.UserCouponResponseDto;
 import com.nhnacademy.domain.CouponPolicy;
-import com.nhnacademy.domain.UserCoupon;
 import com.nhnacademy.dto.response.CouponPolicyResponseDto;
 import com.nhnacademy.service.CouponService;
 import jakarta.validation.Valid;
@@ -29,7 +29,7 @@ public class CouponController {
     private final CouponService couponService;
 
     @PostMapping("/policy")
-    public ResponseEntity<CouponPolicy> createCouponPolicy(@Valid @RequestBody CouponPolicyRequest request, BindingResult bindingResult) {
+    public ResponseEntity<CouponPolicy> createCouponPolicy(@Valid @RequestBody CouponPolicyRequestDto request, BindingResult bindingResult) {
 
         if(bindingResult.hasErrors()) {
             throw new ValidationFailedException(bindingResult);
@@ -52,46 +52,46 @@ public class CouponController {
     }
 
     @PostMapping("/users/{userNo}/issue/{couponPolicyId}")
-    public ResponseEntity<UserCouponResponse> issueCouponToUser(@PathVariable Long userNo, @PathVariable Long couponPolicyId) {
-        UserCoupon issuedCoupon = couponService.issueCouponToUser(userNo, couponPolicyId);
-        return new ResponseEntity<>(UserCouponResponse.from(issuedCoupon), HttpStatus.CREATED);
+    public ResponseEntity<UserCouponResponseDto> issueCouponToUser(@PathVariable Long userNo, @PathVariable Long couponPolicyId) {
+        UserCouponList issuedCoupon = couponService.issueCouponToUser(userNo, couponPolicyId);
+        return new ResponseEntity<>(UserCouponResponseDto.from(issuedCoupon), HttpStatus.CREATED);
     }
 
     @PostMapping("/users/{userNo}/issue-welcome")
-    public ResponseEntity<UserCouponResponse> issueWelcomeCoupon(@PathVariable Long userNo) {
-        UserCoupon welcomeCoupon = couponService.issueWelcomeCoupon(userNo);
-        return new ResponseEntity<>(UserCouponResponse.from(welcomeCoupon), HttpStatus.CREATED);
+    public ResponseEntity<UserCouponResponseDto> issueWelcomeCoupon(@PathVariable Long userNo) {
+        UserCouponList welcomeCoupon = couponService.issueWelcomeCoupon(userNo);
+        return new ResponseEntity<>(UserCouponResponseDto.from(welcomeCoupon), HttpStatus.CREATED);
     }
 
     @PostMapping("/users/{userNo}/issue-birthday")
-    public ResponseEntity<UserCouponResponse> issueBirthdayCoupon(@PathVariable Long userNo,
-                                                                  @RequestParam int birthMonth) {
+    public ResponseEntity<UserCouponResponseDto> issueBirthdayCoupon(@PathVariable Long userNo,
+                                                                     @RequestParam int birthMonth) {
         LocalDate userBirthDate = LocalDate.now().withMonth(birthMonth).withDayOfMonth(1);
-        UserCoupon birthdayCoupon = couponService.issueBirthdayCoupon(userNo, userBirthDate);
-        return new ResponseEntity<>(UserCouponResponse.from(birthdayCoupon), HttpStatus.CREATED);
+        UserCouponList birthdayCoupon = couponService.issueBirthdayCoupon(userNo, userBirthDate);
+        return new ResponseEntity<>(UserCouponResponseDto.from(birthdayCoupon), HttpStatus.CREATED);
     }
 
     @PostMapping("/issue/book")
-    public ResponseEntity<UserCouponResponse> issueBookCoupon(@RequestBody IssueBookCouponRequest request) {
-        UserCoupon issuedCoupon = couponService.issueBookCoupon(request);
-        return new ResponseEntity<>(UserCouponResponse.from(issuedCoupon), HttpStatus.CREATED);
+    public ResponseEntity<UserCouponResponseDto> issueBookCoupon(@RequestBody IssueBookCouponRequestDto request) {
+        UserCouponList issuedCoupon = couponService.issueBookCoupon(request);
+        return new ResponseEntity<>(UserCouponResponseDto.from(issuedCoupon), HttpStatus.CREATED);
     }
 
     @GetMapping("/users/{userNo}/active")
-    public ResponseEntity<List<UserCouponResponse>> getActiveUserCoupons(@PathVariable Long userNo) {
+    public ResponseEntity<List<UserCouponResponseDto>> getActiveUserCoupons(@PathVariable Long userNo) {
         log.info("Coupon-API CouponController: Received request for active coupons for userNo: {}", userNo);
-        List<UserCoupon> activeCoupons = couponService.getActiveUserCoupons(userNo);
-        List<UserCouponResponse> responses = activeCoupons.stream()
-                .map(UserCouponResponse::from)
+        List<UserCouponList> activeCoupons = couponService.getActiveUserCoupons(userNo);
+        List<UserCouponResponseDto> responses = activeCoupons.stream()
+                .map(UserCouponResponseDto::from)
                 .toList();
         return new ResponseEntity<>(responses, HttpStatus.OK);
     }
 
     @GetMapping("/users/{userNo}/used")
-    public ResponseEntity<List<UserCouponResponse>> getUsedUserCoupons(@PathVariable Long userNo) {
-        List<UserCoupon> userCoupons = couponService.getUsedUserCoupons(userNo);
-        List<UserCouponResponse> responses = userCoupons.stream()
-                .map(UserCouponResponse::from)
+    public ResponseEntity<List<UserCouponResponseDto>> getUsedUserCoupons(@PathVariable Long userNo) {
+        List<UserCouponList> userCoupons = couponService.getUsedUserCoupons(userNo);
+        List<UserCouponResponseDto> responses = userCoupons.stream()
+                .map(UserCouponResponseDto::from)
                 .toList();
         return new ResponseEntity<>(responses, HttpStatus.OK);
     }
@@ -100,7 +100,7 @@ public class CouponController {
     public ResponseEntity<String> useCoupon(
             @PathVariable Long userNo,
             @PathVariable Long userCouponId,
-            @RequestBody CouponUseRequest request) {
+            @RequestBody CouponUseRequestDto request) {
         couponService.useCoupon(userNo, userCouponId, request.getOrderId());
         return new ResponseEntity<>("쿠폰이 성공적으로 사용되었습니다.", HttpStatus.OK);
     }
