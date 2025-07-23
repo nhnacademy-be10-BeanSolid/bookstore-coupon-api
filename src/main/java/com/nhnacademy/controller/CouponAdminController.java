@@ -1,12 +1,15 @@
 package com.nhnacademy.controller;
 
+import com.nhnacademy.common.exception.ValidationFailedException;
 import com.nhnacademy.domain.CouponPolicy;
-import com.nhnacademy.domain.CouponScope;
-import com.nhnacademy.dto.CouponPolicyResponseDto;
-import com.nhnacademy.dto.request.CouponPolicyRequest;
+import com.nhnacademy.domain.enumtype.CouponScope;
+import com.nhnacademy.dto.response.CouponPolicyResponseDto;
+import com.nhnacademy.dto.request.CouponPolicyRequestDto;
 import com.nhnacademy.service.CouponService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -38,20 +41,13 @@ public class CouponAdminController {
     }
 
     @PostMapping("/coupon-policies")
-    public ResponseEntity<Void> createCouponPolicy(@RequestBody CouponPolicyRequest request) {
-        couponService.createCouponPolicy(
-                request.getCouponName(),
-                request.getCouponDiscountType(),
-                request.getCouponDiscountAmount(),
-                request.getCouponMinimumOrderAmount(),
-                request.getCouponMaximumDiscountAmount(),
-                request.getCouponScope(),
-                request.getCouponExpiredAt(),
-                request.getCouponIssuePeriod(),
-                request.getBookIds(),
-                request.getCategoryIds(),
-                request.getCouponType()
-        );
+    public ResponseEntity<Void> createCouponPolicy(@Valid @RequestBody CouponPolicyRequestDto request, BindingResult bindingResult) {
+
+        if(bindingResult.hasErrors()) {
+            throw new ValidationFailedException(bindingResult);
+        }
+
+        couponService.createCouponPolicy(request);
         return ResponseEntity.ok().build();
     }
 

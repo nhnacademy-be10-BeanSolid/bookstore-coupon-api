@@ -1,7 +1,7 @@
 package com.nhnacademy.repository.queryfactory;
 
 import com.nhnacademy.domain.CouponPolicy;
-import com.nhnacademy.domain.CouponType;
+import com.nhnacademy.domain.enumtype.CouponType;
 
 import java.util.List;
 import java.util.Optional;

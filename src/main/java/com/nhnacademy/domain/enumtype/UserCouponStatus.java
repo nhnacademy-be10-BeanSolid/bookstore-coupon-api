@@ -1,4 +1,4 @@
-package com.nhnacademy.domain;
+package com.nhnacademy.domain.enumtype;
 
 public enum UserCouponStatus {
     ACTIVE,    // 활성

@@ -1,34 +1,48 @@
-package com.nhnacademy.dto;
+package com.nhnacademy.dto.request;
 
-import com.nhnacademy.domain.CouponDiscountType;
-import com.nhnacademy.domain.CouponScope;
-import com.nhnacademy.domain.CouponType;
+import com.nhnacademy.domain.enumtype.CouponDiscountType;
+import com.nhnacademy.domain.enumtype.CouponScope;
+import com.nhnacademy.domain.enumtype.CouponType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CouponPolicyResponseDto {
-    private Long couponId;
+public class CouponPolicyRequestDto {
+    @NotBlank
     private String couponName;
+
+    @NotNull
     private CouponDiscountType couponDiscountType;
-    private int couponDiscountAmount;
+
+    @Min(0)
+    private Integer couponDiscountAmount;
+
+    @Min(0)
     private Integer couponMinimumOrderAmount;
+
+    @Min(0)
     private Integer couponMaximumDiscountAmount;
+
+    @NotNull
     private CouponScope couponScope;
+
     private LocalDateTime couponExpiredAt;
+
     private Integer couponIssuePeriod;
+
+    @NotNull
     private CouponType couponType;
-    private LocalDateTime couponCreatedAt;
+
     private List<Long> bookIds;
     private List<Long> categoryIds;
 }
