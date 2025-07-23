@@ -4,6 +4,7 @@ import com.nhnacademy.domain.enumtype.CouponDiscountType;
 import com.nhnacademy.domain.enumtype.CouponScope;
 import com.nhnacademy.domain.enumtype.CouponType;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import jakarta.validation.constraints.Min;
@@ -15,6 +16,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class CouponPolicyRequestDto {
     @NotBlank
     private String couponName;
