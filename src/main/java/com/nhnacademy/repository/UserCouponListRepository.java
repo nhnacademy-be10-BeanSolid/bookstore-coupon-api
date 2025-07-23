@@ -10,11 +10,6 @@ import java.util.Optional;
 
 public interface UserCouponListRepository extends JpaRepository<UserCouponList, Long>, UserCouponListRepositoryCustom {
 
-    //추후에 사용 예정
-//    List<UserCouponList> findByUserNo(Long userNo);
-//
-//    List<UserCouponList> findByStatusAndExpiredAtBefore(UserCouponStatus status, LocalDateTime dateTime);
-
     List<UserCouponList> findByUserNoAndCouponPolicy(Long userNo, CouponPolicy couponPolicy);
 
     Optional<UserCouponList> findByUserNoAndUserCouponId(Long userNo, Long userCouponId);

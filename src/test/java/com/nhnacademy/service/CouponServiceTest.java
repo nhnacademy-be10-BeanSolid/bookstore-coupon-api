@@ -19,7 +19,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -251,7 +250,7 @@ class CouponServiceTest {
     @DisplayName("사용자 쿠폰 발급 중 만료된 쿠폰 정책 예외 발생")
     void testIssueCouponToUser_CouponExpiredException() {
 
-        CouponPolicy TestCouponPolicy = CouponPolicy.builder()
+        CouponPolicy testCouponPolicy = CouponPolicy.builder()
                 .couponId(2L)
                 .couponName("Test Coupon")
                 .couponDiscountType(CouponDiscountType.PERCENT)
@@ -264,7 +263,7 @@ class CouponServiceTest {
                 .couponExpiredAt(LocalDateTime.now().minusDays(30))
                 .build();
 
-        when(couponPolicyRepository.findById(2L)).thenReturn(Optional.of(TestCouponPolicy));
+        when(couponPolicyRepository.findById(2L)).thenReturn(Optional.of(testCouponPolicy));
 
         CouponExpiredException exception = assertThrows(CouponExpiredException.class,
                 () -> couponService.issueCouponToUser(100L, 2L));
@@ -514,8 +513,34 @@ class CouponServiceTest {
 
 
     @Test
-    @DisplayName("주문 할인금액 계산 정상")
-    void testCalculateDiscountAmount() {
+    @DisplayName("할인 금액 계산 - 금액 할인")
+    void testCalculateDiscountAmount_Amount() {
+        Long userNo = 70L;
+        Long userCouponId = 200L;
+        int orderAmount = 20000;
+        List<Long> bookIds = List.of(1L, 2L);
+        List<Long> categoryIds = List.of(10L);
+
+        couponPolicy.setCouponDiscountType(CouponDiscountType.AMOUNT);
+        couponPolicy.setCouponDiscountAmount(5000);
+
+        when(userCouponListRepository.findByUserNoAndUserCouponId(userNo, userCouponId))
+                .thenReturn(Optional.of(UserCouponList.builder()
+                        .userCouponId(userCouponId)
+                        .userNo(userNo)
+                        .couponPolicy(couponPolicy)
+                        .status(UserCouponStatus.ACTIVE)
+                        .expiredAt(LocalDateTime.now().plusDays(10))
+                        .build()));
+
+        int discountAmount = couponService.calculateDiscountAmount(userNo, userCouponId, orderAmount, bookIds, categoryIds);
+
+        assertEquals(5000, discountAmount);
+    }
+
+    @Test
+    @DisplayName("할인 금액 계산 - 퍼센트 할인")
+    void testCalculateDiscountAmount_Percent() {
         Long userNo = 70L;
         Long userCouponId = 200L;
         int orderAmount = 20000;
@@ -533,7 +558,78 @@ class CouponServiceTest {
 
         int discountAmount = couponService.calculateDiscountAmount(userNo, userCouponId, orderAmount, bookIds, categoryIds);
 
-        assertTrue(discountAmount >= 0);
+        assertEquals(2000, discountAmount);
+    }
+
+    @Test
+    @DisplayName("할인 금액 계산 - 최소 주문 금액 미달")
+    void testCalculateDiscountAmount_MinimumOrderAmountNotMet() {
+        Long userNo = 70L;
+        Long userCouponId = 200L;
+        int orderAmount = 5000;
+        List<Long> bookIds = List.of(1L, 2L);
+        List<Long> categoryIds = List.of(10L);
+
+        when(userCouponListRepository.findByUserNoAndUserCouponId(userNo, userCouponId))
+                .thenReturn(Optional.of(UserCouponList.builder()
+                        .userCouponId(userCouponId)
+                        .userNo(userNo)
+                        .couponPolicy(couponPolicy)
+                        .status(UserCouponStatus.ACTIVE)
+                        .expiredAt(LocalDateTime.now().plusDays(10))
+                        .build()));
+
+        assertThrows(CouponNotApplicableException.class, () ->
+            couponService.calculateDiscountAmount(userNo, userCouponId, orderAmount, bookIds, categoryIds));
+
+    }
+
+    @Test
+    @DisplayName("할인 금액 계산 - 도서 쿠폰 적용 불가")
+    void testCalculateDiscountAmount_BookCouponNotApplicable() {
+        Long userNo = 70L;
+        Long userCouponId = 200L;
+        int orderAmount = 20000;
+        List<Long> bookIds = List.of(3L, 4L); // 적용 안되는 도서
+        List<Long> categoryIds = List.of(10L);
+
+        when(userCouponListRepository.findByUserNoAndUserCouponId(userNo, userCouponId))
+                .thenReturn(Optional.of(UserCouponList.builder()
+                        .userCouponId(userCouponId)
+                        .userNo(userNo)
+                        .couponPolicy(bookCouponPolicy)
+                        .status(UserCouponStatus.ACTIVE)
+                        .expiredAt(LocalDateTime.now().plusDays(10))
+                        .build()));
+
+        when(couponBookRepository.existsByCouponPolicyIdAndBookIdsIn(bookCouponPolicy.getCouponId(), bookIds)).thenReturn(false);
+
+        assertThrows(CouponNotApplicableException.class, () ->
+            couponService.calculateDiscountAmount(userNo, userCouponId, orderAmount, bookIds, categoryIds));
+    }
+
+    @Test
+    @DisplayName("할인 금액 계산 - 카테고리 쿠폰 적용 불가")
+    void testCalculateDiscountAmount_CategoryCouponNotApplicable() {
+        Long userNo = 70L;
+        Long userCouponId = 200L;
+        int orderAmount = 20000;
+        List<Long> bookIds = List.of(1L, 2L);
+        List<Long> categoryIds = List.of(20L, 30L); // 적용 안되는 카테고리
+
+        when(userCouponListRepository.findByUserNoAndUserCouponId(userNo, userCouponId))
+                .thenReturn(Optional.of(UserCouponList.builder()
+                        .userCouponId(userCouponId)
+                        .userNo(userNo)
+                        .couponPolicy(categoryCouponPolicy)
+                        .status(UserCouponStatus.ACTIVE)
+                        .expiredAt(LocalDateTime.now().plusDays(10))
+                        .build()));
+
+        when(couponCategoryRepository.existsByCouponPolicyIdAndCategoryIdsIn(categoryCouponPolicy.getCouponId(), categoryIds)).thenReturn(false);
+
+        assertThrows(CouponNotApplicableException.class,
+                () -> couponService.calculateDiscountAmount(userNo, userCouponId, orderAmount, bookIds, categoryIds));
     }
 
     @Test
