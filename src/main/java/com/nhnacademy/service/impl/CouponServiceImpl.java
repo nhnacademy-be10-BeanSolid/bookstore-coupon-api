@@ -35,6 +35,8 @@ import java.util.stream.Collectors;
 @Transactional
 public class CouponServiceImpl implements CouponService {
 
+    private static final String NOT_EXIST_COUPON = "존재하지 않는 쿠폰 정책입니다. Policy ID: ";
+
     private final CouponPolicyRepository couponPolicyRepository;
     private final UserCouponListRepository userCouponListRepository;
     private final CouponBookRepository couponBookRepository;
@@ -104,7 +106,7 @@ public class CouponServiceImpl implements CouponService {
     @Transactional
     public UserCouponList issueCouponToUser(Long userNo, Long couponPolicyId) {
         CouponPolicy policy = couponPolicyRepository.findById(couponPolicyId)
-                .orElseThrow(() -> new CouponNotFoundException("존재하지 않는 쿠폰 정책입니다. Policy ID: " + couponPolicyId));
+                .orElseThrow(() -> new CouponNotFoundException(NOT_EXIST_COUPON + couponPolicyId));
 
         if (policy.getCouponExpiredAt() != null && policy.getCouponExpiredAt().isBefore(LocalDateTime.now())) {
             throw new CouponExpiredException("만료된 쿠폰 정책입니다. 이 정책으로는 쿠폰을 발급할 수 없습니다.");
@@ -132,7 +134,7 @@ public class CouponServiceImpl implements CouponService {
 
     public UserCouponList issueBookCoupon(IssueBookCouponRequestDto request) {
         CouponPolicy policy = couponPolicyRepository.findById(request.getCouponPolicyId())
-                .orElseThrow(() -> new CouponNotFoundException("존재하지 않는 쿠폰 정책입니다. Policy ID: " + request.getCouponPolicyId()));
+                .orElseThrow(() -> new CouponNotFoundException(NOT_EXIST_COUPON + request.getCouponPolicyId()));
 
         if (policy.getCouponScope() != CouponScope.BOOK) {
             throw new CouponNotApplicableException("해당 쿠폰 정책은 도서 전용 쿠폰이 아닙니다.");
@@ -232,7 +234,7 @@ public class CouponServiceImpl implements CouponService {
 
     public void deleteCouponPolicy(Long couponId) {
         CouponPolicy policy = couponPolicyRepository.findById(couponId)
-                .orElseThrow(() -> new CouponNotFoundException("존재하지 않는 쿠폰 정책입니다. Policy ID: " + couponId));
+                .orElseThrow(() -> new CouponNotFoundException(NOT_EXIST_COUPON + couponId));
         couponBookRepository.deleteByCouponPolicy(policy); // 연결된 CouponBook 먼저 삭제
         userCouponListRepository.deleteByCouponPolicy(policy); // 연결된 UsedCoupon 먼저 삭제
         couponPolicyRepository.delete(policy);
@@ -284,7 +286,7 @@ public class CouponServiceImpl implements CouponService {
 
     public void startCouponIssuingProcess(Long couponPolicyId) {
         couponPolicyRepository.findById(couponPolicyId)
-                .orElseThrow(() -> new CouponNotFoundException("존재하지 않는 쿠폰 정책입니다. Policy ID: " + couponPolicyId));
+                .orElseThrow(() -> new CouponNotFoundException(NOT_EXIST_COUPON + couponPolicyId));
 
         log.info("Publishing CouponIssuingStartedEvent for couponPolicyId: {}", couponPolicyId);
 
@@ -297,7 +299,7 @@ public class CouponServiceImpl implements CouponService {
 
     public void issueCouponToBook(Long couponPolicyId, Long bookId) {
         CouponPolicy policy = couponPolicyRepository.findById(couponPolicyId)
-                .orElseThrow(() -> new CouponNotFoundException("존재하지 않는 쿠폰 정책입니다. Policy ID: " + couponPolicyId));
+                .orElseThrow(() -> new CouponNotFoundException(NOT_EXIST_COUPON + couponPolicyId));
 
         if (policy.getCouponScope() != CouponScope.BOOK) {
             throw new CouponNotApplicableException("해당 쿠폰 정책은 도서 전용 쿠폰이 아닙니다.");

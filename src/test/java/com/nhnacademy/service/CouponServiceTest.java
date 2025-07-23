@@ -251,7 +251,7 @@ class CouponServiceTest {
     @DisplayName("사용자 쿠폰 발급 중 만료된 쿠폰 정책 예외 발생")
     void testIssueCouponToUser_CouponExpiredException() {
 
-        CouponPolicy TestCouponPolicy = CouponPolicy.builder()
+        CouponPolicy testCouponPolicy = CouponPolicy.builder()
                 .couponId(2L)
                 .couponName("Test Coupon")
                 .couponDiscountType(CouponDiscountType.PERCENT)
@@ -264,7 +264,7 @@ class CouponServiceTest {
                 .couponExpiredAt(LocalDateTime.now().minusDays(30))
                 .build();
 
-        when(couponPolicyRepository.findById(2L)).thenReturn(Optional.of(TestCouponPolicy));
+        when(couponPolicyRepository.findById(2L)).thenReturn(Optional.of(testCouponPolicy));
 
         CouponExpiredException exception = assertThrows(CouponExpiredException.class,
                 () -> couponService.issueCouponToUser(100L, 2L));

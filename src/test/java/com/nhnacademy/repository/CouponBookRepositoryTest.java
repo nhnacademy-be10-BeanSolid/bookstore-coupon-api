@@ -113,8 +113,8 @@ class CouponBookRepositoryTest {
 
         List<Long> bookIds = couponBookRepository.findBookIdsByCouponId(savedPolicy.getCouponId());
 
-        assertThat(bookIds).hasSize(2);
-        assertThat(bookIds).containsExactlyInAnyOrder(301L, 302L);
+        assertThat(bookIds).hasSize(2)
+                .containsExactlyInAnyOrder(301L, 302L);
     }
 
     @Test
