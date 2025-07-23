@@ -150,14 +150,14 @@ class UserCouponListRepositoryTest {
                 .userNo(10L)
                 .couponPolicy(savedPolicy)
                 .status(UserCouponStatus.ACTIVE)
-                .expiredAt(LocalDateTime.now().plusDays(1))    // 아직 만료 안됨
+                .expiredAt(LocalDateTime.now().plusDays(1))
                 .build();
 
         UserCouponList expiredButActiveStatusCoupon = UserCouponList.builder()
                 .userNo(10L)
                 .couponPolicy(savedPolicy)
                 .status(UserCouponStatus.ACTIVE)
-                .expiredAt(LocalDateTime.now().minusDays(1))   // 만료됨
+                .expiredAt(LocalDateTime.now().minusDays(1))
                 .build();
 
         userCouponListRepository.save(activeCoupon);
@@ -165,13 +165,17 @@ class UserCouponListRepositoryTest {
 
         List<UserCouponList> results = userCouponListRepository.findActiveCouponsByUserNo(10L);
 
-        assertThat(results).isNotEmpty()
+        assertThat(results)
+                .isNotEmpty()
                 .allMatch(c -> c.getStatus() == UserCouponStatus.ACTIVE)
-                .allMatch(c -> c.getExpiredAt().isAfter(LocalDateTime.now()));
-        assertThat(results).extracting("expiredAt", LocalDateTime.class)
+                .allMatch(c -> c.getExpiredAt().isAfter(LocalDateTime.now()))
+                .contains(activeCoupon)
+                .doesNotContain(expiredButActiveStatusCoupon);
+
+        assertThat(results)
+                .extracting("expiredAt", LocalDateTime.class)
                 .allMatch(expiredAt -> expiredAt.isAfter(LocalDateTime.now()));
-        assertThat(results).contains(activeCoupon);
-        assertThat(results).doesNotContain(expiredButActiveStatusCoupon);
+
     }
 
     @Test
@@ -197,9 +201,9 @@ class UserCouponListRepositoryTest {
         List<UserCouponList> results = userCouponListRepository.findUsedCouponsByUserNo(20L);
 
         assertThat(results).isNotEmpty()
-                .allMatch(c -> c.getStatus() == UserCouponStatus.USED);
-        assertThat(results).contains(usedCoupon);
-        assertThat(results).doesNotContain(activeCoupon);
+                .allMatch(c -> c.getStatus() == UserCouponStatus.USED)
+                .contains(usedCoupon)
+                .doesNotContain(activeCoupon);
     }
 
     @Test
@@ -225,9 +229,9 @@ class UserCouponListRepositoryTest {
         List<UserCouponList> results = userCouponListRepository.findExpiredCouponsByUserNo(30L);
 
         assertThat(results).isNotEmpty()
-                .allMatch(c -> c.getStatus() == UserCouponStatus.EXPIRED);
-        assertThat(results).contains(expiredCoupon);
-        assertThat(results).doesNotContain(usedCoupon);
+                .allMatch(c -> c.getStatus() == UserCouponStatus.EXPIRED)
+                .contains(expiredCoupon)
+                .doesNotContain(usedCoupon);
     }
 
 }

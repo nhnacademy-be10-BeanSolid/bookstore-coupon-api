@@ -115,8 +115,8 @@ class CouponCategoryRepositoryTest {
 
         List<Long> categoryIds = couponCategoryRepository.findCategoryIdsByCouponId(savedPolicy.getCouponId());
 
-        assertThat(categoryIds).hasSize(2);
-        assertThat(categoryIds).containsExactlyInAnyOrder(100L, 101L);
+        assertThat(categoryIds).hasSize(2)
+                .containsExactlyInAnyOrder(100L, 101L);
     }
 
     @Test
