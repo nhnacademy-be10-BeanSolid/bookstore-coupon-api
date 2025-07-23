@@ -244,20 +244,33 @@ public class CouponServiceImpl implements CouponService {
         UserCouponList userCoupon = userCouponListRepository.findByUserNoAndUserCouponId(userNo, userCouponId)
                 .orElseThrow(() -> new UserCouponNotFoundException("쿠폰을 찾을 수 없습니다. UserCoupon ID: " + userCouponId + " 또는 사용자 ID: " + userNo + "와 일치하지 않습니다."));
 
+        validateCouponStatus(userCoupon);
+
+        CouponPolicy policy = userCoupon.getCouponPolicy();
+
+        validateMinimumOrderAmount(policy, orderAmount);
+        validateCouponScope(policy, bookIdsInOrder, categoryIdsInOrder);
+
+        return calculateDiscount(policy, orderAmount);
+    }
+
+    private void validateCouponStatus(UserCouponList userCoupon) {
         if (userCoupon.getStatus() != UserCouponStatus.ACTIVE) {
             throw new CouponNotApplicableException("사용할 수 없는 쿠폰입니다. (ACTIVE 상태가 아님)");
         }
         if (userCoupon.getExpiredAt().isBefore(LocalDateTime.now())) {
             throw new CouponExpiredException("만료된 쿠폰입니다. 할인 계산에 사용할 수 없습니다.");
         }
+    }
 
-        CouponPolicy policy = userCoupon.getCouponPolicy();
-
+    private void validateMinimumOrderAmount(CouponPolicy policy, int orderAmount) {
         if (policy.getCouponMinimumOrderAmount() != null && orderAmount < policy.getCouponMinimumOrderAmount()) {
             throw new CouponNotApplicableException(
                     String.format("최소 주문 금액 %d원 이상이어야 사용 가능합니다.", policy.getCouponMinimumOrderAmount()));
         }
+    }
 
+    private void validateCouponScope(CouponPolicy policy, List<Long> bookIdsInOrder, List<Long> categoryIdsInOrder) {
         if (policy.getCouponScope() == CouponScope.BOOK) {
             boolean isApplicable = couponBookRepository.existsByCouponPolicyIdAndBookIdsIn(policy.getCouponId(), bookIdsInOrder);
             if (!isApplicable) {
@@ -269,7 +282,9 @@ public class CouponServiceImpl implements CouponService {
                 throw new CouponNotApplicableException("주문에 쿠폰 적용 대상 카테고리가 포함되어 있지 않습니다.");
             }
         }
+    }
 
+    private int calculateDiscount(CouponPolicy policy, int orderAmount) {
         int discount;
         if (policy.getCouponDiscountType() == CouponDiscountType.AMOUNT) {
             discount = policy.getCouponDiscountAmount();
