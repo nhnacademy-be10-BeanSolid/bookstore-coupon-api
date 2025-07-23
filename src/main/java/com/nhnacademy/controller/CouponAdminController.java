@@ -91,4 +91,31 @@ public class CouponAdminController {
         couponService.deleteCouponPolicy(couponId);
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/test-issue-percentage-coupon")
+    public ResponseEntity<String> testIssuePercentageCoupon() {
+        // 1. Create CouponPolicyRequestDto for a percentage discount
+        CouponPolicyRequestDto percentageCouponPolicy = CouponPolicyRequestDto.builder()
+                .couponName("정률 20% 할인 쿠폰")
+                .couponDiscountType(com.nhnacademy.domain.enumtype.CouponDiscountType.PERCENT)
+                .couponDiscountAmount(20)
+                .couponMinimumOrderAmount(20000)
+                .couponMaximumDiscountAmount(10000)
+                .couponScope(com.nhnacademy.domain.enumtype.CouponScope.ALL)
+                .couponExpiredAt(java.time.LocalDateTime.now().plusDays(30))
+                .couponIssuePeriod(7)
+                .couponType(com.nhnacademy.domain.enumtype.CouponType.GENERAL)
+                .build();
+
+        // 2. Create the coupon policy and get the created policy object
+        CouponPolicy createdPolicy = couponService.createCouponPolicy(percentageCouponPolicy);
+
+        // 3. Get the ID from the created policy
+        Long couponPolicyId = createdPolicy.getCouponId();
+
+        // 4. Start the process to issue the coupon to all users
+        couponService.startCouponIssuingProcess(couponPolicyId);
+
+        return ResponseEntity.ok("Successfully created and initiated issuance of percentage coupon with ID: " + couponPolicyId);
+    }
 }
