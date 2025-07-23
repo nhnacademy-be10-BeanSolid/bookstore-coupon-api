@@ -9,5 +9,4 @@ class BookstoreCouponApiApplicationTests {
     @Test
     void contextLoads() {
     }
-
 }
