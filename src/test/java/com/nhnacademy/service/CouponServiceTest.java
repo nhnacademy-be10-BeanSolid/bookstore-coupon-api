@@ -1,24 +1,30 @@
 package com.nhnacademy.service;
 
 import com.nhnacademy.common.exception.CouponAlreadyExistException;
-import com.nhnacademy.domain.*;
+import com.nhnacademy.domain.CouponPolicy;
+import com.nhnacademy.domain.UserCouponList;
 import com.nhnacademy.domain.enumtype.CouponDiscountType;
 import com.nhnacademy.domain.enumtype.CouponScope;
 import com.nhnacademy.domain.enumtype.CouponType;
 import com.nhnacademy.domain.enumtype.UserCouponStatus;
 import com.nhnacademy.dto.request.CouponPolicyRequestDto;
 import com.nhnacademy.dto.request.IssueBookCouponRequestDto;
-import com.nhnacademy.dto.response.CouponPolicyResponseDto;
+import com.nhnacademy.dto.request.IssueCategoryCouponRequestDto;
 import com.nhnacademy.exception.*;
-import com.nhnacademy.repository.*;
+import com.nhnacademy.repository.CouponBookRepository;
+import com.nhnacademy.repository.CouponCategoryRepository;
+import com.nhnacademy.repository.CouponPolicyRepository;
+import com.nhnacademy.repository.UserCouponListRepository;
 import com.nhnacademy.service.impl.CouponServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -197,6 +203,56 @@ class CouponServiceTest {
     }
 
     @Test
+    @DisplayName("쿠폰 정책 생성 - ALL 스코프에 bookIds가 있어도 저장 안됨")
+    void testCreateCouponPolicy_AllScopeWithBookIds() {
+        couponPolicyRequestDto = CouponPolicyRequestDto.builder()
+                .couponName("All Scope with BookIds Coupon")
+                .couponDiscountType(CouponDiscountType.PERCENT)
+                .couponDiscountAmount(10)
+                .couponMinimumOrderAmount(10000)
+                .couponMaximumDiscountAmount(2000)
+                .couponScope(CouponScope.ALL)
+                .couponType(CouponType.GENERAL)
+                .couponIssuePeriod(30)
+                .couponExpiredAt(LocalDateTime.now().plusDays(30))
+                .bookIds(List.of(1L, 2L)) // Should be ignored
+                .build();
+
+        when(couponPolicyRepository.save(any(CouponPolicy.class))).thenReturn(couponPolicy);
+
+        couponService.createCouponPolicy(couponPolicyRequestDto);
+
+        verify(couponPolicyRepository).save(any(CouponPolicy.class));
+        verifyNoInteractions(couponBookRepository);
+        verifyNoInteractions(couponCategoryRepository);
+    }
+
+    @Test
+    @DisplayName("쿠폰 정책 생성 - ALL 스코프에 categoryIds가 있어도 저장 안됨")
+    void testCreateCouponPolicy_AllScopeWithCategoryIds() {
+        couponPolicyRequestDto = CouponPolicyRequestDto.builder()
+                .couponName("All Scope with CategoryIds Coupon")
+                .couponDiscountType(CouponDiscountType.PERCENT)
+                .couponDiscountAmount(10)
+                .couponMinimumOrderAmount(10000)
+                .couponMaximumDiscountAmount(2000)
+                .couponScope(CouponScope.ALL)
+                .couponType(CouponType.GENERAL)
+                .couponIssuePeriod(30)
+                .couponExpiredAt(LocalDateTime.now().plusDays(30))
+                .categoryIds(List.of(1L, 2L)) // Should be ignored
+                .build();
+
+        when(couponPolicyRepository.save(any(CouponPolicy.class))).thenReturn(couponPolicy);
+
+        couponService.createCouponPolicy(couponPolicyRequestDto);
+
+        verify(couponPolicyRepository).save(any(CouponPolicy.class));
+        verifyNoInteractions(couponBookRepository);
+        verifyNoInteractions(couponCategoryRepository);
+    }
+
+    @Test
     @DisplayName("특정 쿠폰 정책 조회 - 존재할 때 반환")
     void testGetCouponPolicyById_Exists() {
         when(couponPolicyRepository.findById(1L)).thenReturn(Optional.of(couponPolicy));
@@ -247,6 +303,86 @@ class CouponServiceTest {
     }
 
     @Test
+    @DisplayName("사용자 쿠폰 발급 - couponIssuePeriod가 null일 때 couponExpiredAt으로 유효기간 계산")
+    void testIssueCouponToUser_NullIssuePeriod() {
+        Long userNo = 101L;
+        LocalDateTime fixedExpiredAt = LocalDateTime.now().plusDays(15);
+        CouponPolicy policyWithNullIssuePeriod = CouponPolicy.builder()
+                .couponId(10L)
+                .couponName("Null Issue Period Coupon")
+                .couponDiscountType(CouponDiscountType.PERCENT)
+                .couponDiscountAmount(10)
+                .couponMinimumOrderAmount(1000)
+                .couponMaximumDiscountAmount(500)
+                .couponScope(CouponScope.ALL)
+                .couponType(CouponType.GENERAL)
+                .couponIssuePeriod(null)
+                .couponExpiredAt(fixedExpiredAt)
+                .build();
+
+        when(couponPolicyRepository.findById(10L)).thenReturn(Optional.of(policyWithNullIssuePeriod));
+        when(userCouponListRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+
+        UserCouponList userCouponList = couponService.issueCouponToUser(userNo, 10L);
+
+        assertNotNull(userCouponList);
+        assertEquals(fixedExpiredAt.toLocalDate(), userCouponList.getExpiredAt().toLocalDate());
+    }
+
+    @Test
+    @DisplayName("사용자 쿠폰 발급 - couponExpiredAt이 null일 때 couponIssuePeriod로 유효기간 계산")
+    void testIssueCouponToUser_NullExpiredAt() {
+        Long userNo = 102L;
+        Integer issuePeriod = 20;
+        CouponPolicy policyWithNullExpiredAt = CouponPolicy.builder()
+                .couponId(11L)
+                .couponName("Null Expired At Coupon")
+                .couponDiscountType(CouponDiscountType.PERCENT)
+                .couponDiscountAmount(10)
+                .couponMinimumOrderAmount(1000)
+                .couponMaximumDiscountAmount(500)
+                .couponScope(CouponScope.ALL)
+                .couponType(CouponType.GENERAL)
+                .couponIssuePeriod(issuePeriod)
+                .couponExpiredAt(null)
+                .build();
+
+        when(couponPolicyRepository.findById(11L)).thenReturn(Optional.of(policyWithNullExpiredAt));
+        when(userCouponListRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+
+        UserCouponList userCouponList = couponService.issueCouponToUser(userNo, 11L);
+
+        assertNotNull(userCouponList);
+        assertEquals(LocalDateTime.now().plusDays(issuePeriod).toLocalDate(), userCouponList.getExpiredAt().toLocalDate());
+    }
+
+    @Test
+    @DisplayName("사용자 쿠폰 발급 - 둘 다 null일 때 기본 365일 유효기간 계산")
+    void testIssueCouponToUser_BothNull() {
+        Long userNo = 103L;
+        CouponPolicy policyWithBothNull = CouponPolicy.builder()
+                .couponId(12L)
+                .couponName("Both Null Coupon")
+                .couponDiscountType(CouponDiscountType.PERCENT)
+                .couponDiscountAmount(10)
+                .couponMinimumOrderAmount(1000)
+                .couponMaximumDiscountAmount(500)
+                .couponScope(CouponScope.ALL)
+                .couponType(CouponType.GENERAL)
+                .couponIssuePeriod(null)
+                .couponExpiredAt(null)
+                .build();
+
+        when(couponPolicyRepository.findById(12L)).thenReturn(Optional.of(policyWithBothNull));
+        when(userCouponListRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+
+        UserCouponList userCouponList = couponService.issueCouponToUser(userNo, 12L);
+
+        assertNotNull(userCouponList);
+        assertEquals(LocalDateTime.now().plusDays(365).toLocalDate(), userCouponList.getExpiredAt().toLocalDate());
+    }
+
+    @Test
     @DisplayName("사용자 쿠폰 발급 중 만료된 쿠폰 정책 예외 발생")
     void testIssueCouponToUser_CouponExpiredException() {
 
@@ -292,17 +428,63 @@ class CouponServiceTest {
     void testIssueBookCoupon_NotApplicableBook() {
 
 
-        when(couponPolicyRepository.findById(1L)).thenReturn(Optional.of(couponPolicy));
+        when(couponPolicyRepository.findById(bookCouponPolicy.getCouponId())).thenReturn(Optional.of(bookCouponPolicy));
+        when(couponBookRepository.existsByCouponPolicy_CouponIdAndBookId(bookCouponPolicy.getCouponId(), 100L)).thenReturn(false);
 
         IssueBookCouponRequestDto requestDto = IssueBookCouponRequestDto.builder()
                 .userId(100L)
-                .couponPolicyId(1L)
+                .couponPolicyId(bookCouponPolicy.getCouponId())
                 .bookId(100L)
                 .build();
 
         CouponNotApplicableException ex = assertThrows(CouponNotApplicableException.class,
                 () -> couponService.issueBookCoupon(requestDto));
-        assertTrue(ex.getMessage().contains("해당 쿠폰 정책은 도서 전용 쿠폰이 아닙니다."));
+        assertTrue(ex.getMessage().contains("해당 도서에 적용되는 쿠폰 정책이 아닙니다."));
+    }
+
+    @Test
+    @DisplayName("카테고리 쿠폰 발급 - 정책 미존재 예외")
+    void testIssueCategoryCoupon_PolicyNotFound() {
+        when(couponPolicyRepository.findById(999L)).thenReturn(Optional.empty());
+
+        IssueCategoryCouponRequestDto requestDto = IssueCategoryCouponRequestDto.builder()
+                .userId(1L)
+                .couponPolicyId(999L)
+                .categoryId(1L)
+                .build();
+
+        assertThrows(CouponNotFoundException.class, () -> couponService.issueCategoryCoupon(requestDto.getUserId(), requestDto.getCouponPolicyId(), requestDto.getCategoryId()));
+    }
+
+    @Test
+    @DisplayName("카테고리 쿠폰 발급 - 스코프가 CATEGORY 아닐 경우 예외")
+    void testIssueCategoryCoupon_NotCategoryScope() {
+        when(couponPolicyRepository.findById(bookCouponPolicy.getCouponId())).thenReturn(Optional.of(bookCouponPolicy));
+
+        IssueCategoryCouponRequestDto requestDto = IssueCategoryCouponRequestDto.builder()
+                .userId(1L)
+                .couponPolicyId(bookCouponPolicy.getCouponId())
+                .categoryId(1L)
+                .build();
+
+        assertThrows(CouponNotApplicableException.class,
+                () -> couponService.issueCategoryCoupon(requestDto.getUserId(), requestDto.getCouponPolicyId(), requestDto.getCategoryId()));
+    }
+
+    @Test
+    @DisplayName("카테고리 쿠폰 발급 - 적용 카테고리 아닐 때 예외")
+    void testIssueCategoryCoupon_NotApplicableCategory() {
+        when(couponPolicyRepository.findById(categoryCouponPolicy.getCouponId())).thenReturn(Optional.of(categoryCouponPolicy));
+        when(couponCategoryRepository.existsByCouponPolicy_CouponIdAndCategoryId(categoryCouponPolicy.getCouponId(), 999L)).thenReturn(false);
+
+        IssueCategoryCouponRequestDto requestDto = IssueCategoryCouponRequestDto.builder()
+                .userId(1L)
+                .couponPolicyId(categoryCouponPolicy.getCouponId())
+                .categoryId(999L)
+                .build();
+
+        assertThrows(CouponNotApplicableException.class,
+                () -> couponService.issueCategoryCoupon(requestDto.getUserId(), requestDto.getCouponPolicyId(), requestDto.getCategoryId()));
     }
 
     @Test
@@ -389,8 +571,6 @@ class CouponServiceTest {
     }
 
 
-
-
     @Test
     @DisplayName("생일 쿠폰 중복 발급 예외")
     void testIssueBirthdayCoupon_AlreadyExistException() {
@@ -417,7 +597,6 @@ class CouponServiceTest {
         verify(couponPolicyRepository).findByCouponType(CouponType.BIRTHDAY);
         verify(userCouponListRepository).findByUserNoAndCouponPolicy(eq(userNo), any(CouponPolicy.class));
     }
-
 
 
     @Test
@@ -561,6 +740,32 @@ class CouponServiceTest {
         assertEquals(2000, discountAmount);
     }
 
+    
+
+    @Test
+    @DisplayName("할인 금액 계산 - 만료된 쿠폰 예외")
+    void testCalculateDiscountAmount_ExpiredCoupon() {
+        Long userNo = 70L;
+        Long userCouponId = 200L;
+        int orderAmount = 20000;
+        List<Long> bookIds = List.of(1L, 2L);
+        List<Long> categoryIds = List.of(10L);
+
+        UserCouponList expiredCoupon = UserCouponList.builder()
+                .userCouponId(userCouponId)
+                .userNo(userNo)
+                .couponPolicy(couponPolicy)
+                .status(UserCouponStatus.ACTIVE)
+                .expiredAt(LocalDateTime.now().minusDays(1))
+                .build();
+
+        when(userCouponListRepository.findByUserNoAndUserCouponId(userNo, userCouponId))
+                .thenReturn(Optional.of(expiredCoupon));
+
+        assertThrows(CouponExpiredException.class, () ->
+                couponService.calculateDiscountAmount(userNo, userCouponId, orderAmount, bookIds, categoryIds));
+    }
+
     @Test
     @DisplayName("할인 금액 계산 - 최소 주문 금액 미달")
     void testCalculateDiscountAmount_MinimumOrderAmountNotMet() {
@@ -580,7 +785,7 @@ class CouponServiceTest {
                         .build()));
 
         assertThrows(CouponNotApplicableException.class, () ->
-            couponService.calculateDiscountAmount(userNo, userCouponId, orderAmount, bookIds, categoryIds));
+                couponService.calculateDiscountAmount(userNo, userCouponId, orderAmount, bookIds, categoryIds));
 
     }
 
@@ -605,7 +810,7 @@ class CouponServiceTest {
         when(couponBookRepository.existsByCouponPolicyIdAndBookIdsIn(bookCouponPolicy.getCouponId(), bookIds)).thenReturn(false);
 
         assertThrows(CouponNotApplicableException.class, () ->
-            couponService.calculateDiscountAmount(userNo, userCouponId, orderAmount, bookIds, categoryIds));
+                couponService.calculateDiscountAmount(userNo, userCouponId, orderAmount, bookIds, categoryIds));
     }
 
     @Test
@@ -633,6 +838,41 @@ class CouponServiceTest {
     }
 
     @Test
+    @DisplayName("할인 금액 계산 - 알 수 없는 할인 유형 예외")
+    void testCalculateDiscountAmount_UnknownDiscountType() {
+        Long userNo = 70L;
+        Long userCouponId = 200L;
+        int orderAmount = 20000;
+        List<Long> bookIds = List.of(1L, 2L);
+        List<Long> categoryIds = List.of(10L);
+
+        CouponPolicy unknownTypePolicy = CouponPolicy.builder()
+                .couponId(99L)
+                .couponName("Unknown Type Coupon")
+                .couponDiscountType(null) // Simulate unknown type
+                .couponDiscountAmount(10)
+                .couponMinimumOrderAmount(10000)
+                .couponMaximumDiscountAmount(5000)
+                .couponScope(CouponScope.ALL)
+                .couponType(CouponType.GENERAL)
+                .couponIssuePeriod(30)
+                .couponExpiredAt(LocalDateTime.now().plusDays(30))
+                .build();
+
+        when(userCouponListRepository.findByUserNoAndUserCouponId(userNo, userCouponId))
+                .thenReturn(Optional.of(UserCouponList.builder()
+                        .userCouponId(userCouponId)
+                        .userNo(userNo)
+                        .couponPolicy(unknownTypePolicy)
+                        .status(UserCouponStatus.ACTIVE)
+                        .expiredAt(LocalDateTime.now().plusDays(10))
+                        .build()));
+
+        assertThrows(CouponNotApplicableException.class, () ->
+                couponService.calculateDiscountAmount(userNo, userCouponId, orderAmount, bookIds, categoryIds));
+    }
+
+    @Test
     @DisplayName("쿠폰 정책 삭제")
     void testDeleteCouponPolicy() {
         Long couponPolicyId = 5L;
@@ -645,6 +885,16 @@ class CouponServiceTest {
         verify(couponBookRepository).deleteByCouponPolicy(couponPolicy);
         verify(userCouponListRepository).deleteByCouponPolicy(couponPolicy);
         verify(couponPolicyRepository).delete(couponPolicy);
+    }
+
+    @Test
+    @DisplayName("쿠폰 정책 삭제 - 정책 미존재 예외")
+    void testDeleteCouponPolicy_NotFound() {
+        Long couponPolicyId = 999L;
+
+        when(couponPolicyRepository.findById(couponPolicyId)).thenReturn(Optional.empty());
+
+        assertThrows(CouponNotFoundException.class, () -> couponService.deleteCouponPolicy(couponPolicyId));
     }
 
     @Test
@@ -813,5 +1063,8 @@ class CouponServiceTest {
         verify(couponCategoryRepository).existsByCouponPolicyIdAndCategoryIdsIn(categoryCouponPolicy.getCouponId(), categoryIdsInOrder);
     }
 
+    
 
 }
+
+    
