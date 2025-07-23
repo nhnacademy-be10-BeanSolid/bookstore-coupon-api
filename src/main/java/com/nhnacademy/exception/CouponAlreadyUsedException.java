@@ -1,10 +1,8 @@
 package com.nhnacademy.exception;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import com.nhnacademy.common.exception.BadRequestException;
 
-@ResponseStatus(HttpStatus.BAD_REQUEST)
-public class CouponAlreadyUsedException extends RuntimeException {
+public class CouponAlreadyUsedException extends BadRequestException {
     public CouponAlreadyUsedException(String message) {
         super(message);
     }

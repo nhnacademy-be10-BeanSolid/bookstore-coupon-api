@@ -4,23 +4,27 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "coupon_book")
+@Table(name = "coupon_books",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"coupon_id", "book_id"})
+)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@IdClass(CouponBookId.class)
 @Builder
 public class CouponBook {
-    @Id
-    @Column(name = "coupon_id")
-    private Long couponId;
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "coupon_book_id")
+    private Long couponBookId;
+
+    @Setter
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "coupon_id")
+    private CouponPolicy couponPolicy;
+
+    @Setter
     @Column(name = "book_id")
     private Long bookId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("couponId")
-    @JoinColumn(name = "coupon_id")
-    private CouponPolicy couponPolicy;
 }

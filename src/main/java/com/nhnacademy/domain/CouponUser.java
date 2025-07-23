@@ -3,29 +3,29 @@ package com.nhnacademy.domain;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.io.Serializable;
-
 @Entity
-@Table(name = "coupon_user")
+@Table(
+        name = "coupon_users",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"coupon_id", "user_no"})
+)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@IdClass(CouponUser.class)
 @Builder
 @EqualsAndHashCode
-public class CouponUser implements Serializable {
-    private static final long serialVersionUID = 1L;
+public class CouponUser {
 
     @Id
-    @Column(name = "coupon_id")
-    private Long couponId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "coupon_user_id")
+    private Long couponUserId;
 
-    @Id
-    @Column(name = "user_no", length = 20)
-    private String userNo;
-
+    @Setter
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("couponId")
-    @JoinColumn(name = "coupon_id", insertable = false, updatable = false)
+    @JoinColumn(name = "coupon_id")
     private CouponPolicy couponPolicy;
+
+    @Setter
+    @Column(name = "user_no")
+    private Long userNo;
 }
