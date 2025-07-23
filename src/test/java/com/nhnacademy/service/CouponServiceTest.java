@@ -46,7 +46,6 @@ class CouponServiceTest {
     @Mock
     private RabbitTemplate rabbitTemplate;
 
-    @Spy
     @InjectMocks
     private CouponServiceImpl couponService;
 
@@ -580,9 +579,9 @@ class CouponServiceTest {
                         .expiredAt(LocalDateTime.now().plusDays(10))
                         .build()));
 
-        assertThrows(CouponNotApplicableException.class, () -> {
-            couponService.calculateDiscountAmount(userNo, userCouponId, orderAmount, bookIds, categoryIds);
-        });
+        assertThrows(CouponNotApplicableException.class, () ->
+            couponService.calculateDiscountAmount(userNo, userCouponId, orderAmount, bookIds, categoryIds));
+
     }
 
     @Test
@@ -605,9 +604,8 @@ class CouponServiceTest {
 
         when(couponBookRepository.existsByCouponPolicyIdAndBookIdsIn(bookCouponPolicy.getCouponId(), bookIds)).thenReturn(false);
 
-        assertThrows(CouponNotApplicableException.class, () -> {
-            couponService.calculateDiscountAmount(userNo, userCouponId, orderAmount, bookIds, categoryIds);
-        });
+        assertThrows(CouponNotApplicableException.class, () ->
+            couponService.calculateDiscountAmount(userNo, userCouponId, orderAmount, bookIds, categoryIds));
     }
 
     @Test
@@ -630,9 +628,8 @@ class CouponServiceTest {
 
         when(couponCategoryRepository.existsByCouponPolicyIdAndCategoryIdsIn(categoryCouponPolicy.getCouponId(), categoryIds)).thenReturn(false);
 
-        assertThrows(CouponNotApplicableException.class, () -> {
-            couponService.calculateDiscountAmount(userNo, userCouponId, orderAmount, bookIds, categoryIds);
-        });
+        assertThrows(CouponNotApplicableException.class,
+                () -> couponService.calculateDiscountAmount(userNo, userCouponId, orderAmount, bookIds, categoryIds));
     }
 
     @Test
