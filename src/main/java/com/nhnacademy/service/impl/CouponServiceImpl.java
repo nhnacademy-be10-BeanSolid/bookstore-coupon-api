@@ -14,7 +14,7 @@ import com.nhnacademy.dto.response.CouponPolicyResponseDto;
 import com.nhnacademy.repository.CouponBookRepository;
 import com.nhnacademy.repository.CouponCategoryRepository;
 import com.nhnacademy.repository.CouponPolicyRepository;
-import com.nhnacademy.repository.UserCouponListListRepository;
+import com.nhnacademy.repository.UserCouponListRepository;
 import com.nhnacademy.service.CouponService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
 public class CouponServiceImpl implements CouponService {
 
     private final CouponPolicyRepository couponPolicyRepository;
-    private final UserCouponListListRepository userCouponListRepository;
+    private final UserCouponListRepository userCouponListRepository;
     private final CouponBookRepository couponBookRepository;
     private final CouponCategoryRepository couponCategoryRepository;
     private final RabbitTemplate rabbitTemplate;
