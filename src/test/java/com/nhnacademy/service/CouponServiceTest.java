@@ -704,130 +704,113 @@ class CouponServiceTest {
     }
 
     @Test
-    @DisplayName("유저 활성 쿠폰 리스트 조회")
-    void testGetActiveUserCoupons() {
-        Long userNo = 10L;
-        UserCouponList coupon1 = UserCouponList.builder().userNo(userNo).build();
-        UserCouponList coupon2 = UserCouponList.builder().userNo(userNo).build();
-
-        when(userCouponListRepository.findActiveCouponsByUserNo(userNo))
-                .thenReturn(List.of(coupon1, coupon2));
-
-        List<UserCouponList> result = couponService.getActiveUserCoupons(userNo);
-
-        assertNotNull(result);
-        assertEquals(2, result.size());
-        assertTrue(result.stream().allMatch(c -> c.getUserNo().equals(userNo)));
-
-        verify(userCouponListRepository).findActiveCouponsByUserNo(userNo);
-    }
-
-    @Test
-    @DisplayName("유저 사용 쿠폰 리스트 조회")
-    void testGetUsedUserCoupons() {
-        Long userNo = 20L;
-        UserCouponList coupon1 = UserCouponList.builder().userNo(userNo).build();
-
-        when(userCouponListRepository.findUsedCouponsByUserNo(userNo))
-                .thenReturn(List.of(coupon1));
-
-        List<UserCouponList> result = couponService.getUsedUserCoupons(userNo);
-
-        assertNotNull(result);
-        assertEquals(1, result.size());
-        assertEquals(userNo, result.getFirst().getUserNo());
-
-        verify(userCouponListRepository).findUsedCouponsByUserNo(userNo);
-    }
-
-    @Test
-    @DisplayName("쿠폰 정책 단일 조회 - 존재")
-    void testGetCouponPolicy_Exists() {
-        Long policyId = 100L;
-        CouponPolicy mockPolicy = CouponPolicy.builder()
-                .couponId(policyId)
-                .couponName("Demo Coupon")
+    @DisplayName("도서 쿠폰 발급 - 정상")
+    void testIssueBookCoupon_Success() {
+        Long userNo = 100L;
+        Long bookId = 10L;
+        IssueBookCouponRequestDto requestDto = IssueBookCouponRequestDto.builder()
+                .userId(userNo)
+                .couponPolicyId(bookCouponPolicy.getCouponId())
+                .bookId(bookId)
                 .build();
 
-        when(couponPolicyRepository.findById(policyId)).thenReturn(Optional.of(mockPolicy));
+        when(couponPolicyRepository.findById(bookCouponPolicy.getCouponId())).thenReturn(Optional.of(bookCouponPolicy));
+        when(couponBookRepository.existsByCouponPolicy_CouponIdAndBookId(bookCouponPolicy.getCouponId(), bookId)).thenReturn(true);
+        when(userCouponListRepository.save(any(UserCouponList.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        CouponPolicy result = couponService.getCouponPolicy(policyId);
+        UserCouponList result = couponService.issueBookCoupon(requestDto);
 
         assertNotNull(result);
-        assertEquals(policyId, result.getCouponId());
-        assertEquals("Demo Coupon", result.getCouponName());
+        assertEquals(userNo, result.getUserNo());
+        assertEquals(bookCouponPolicy.getCouponId(), result.getCouponPolicy().getCouponId());
 
-        verify(couponPolicyRepository).findById(policyId);
+        verify(couponPolicyRepository).findById(bookCouponPolicy.getCouponId());
+        verify(couponBookRepository).existsByCouponPolicy_CouponIdAndBookId(bookCouponPolicy.getCouponId(), bookId);
+        verify(userCouponListRepository).save(any(UserCouponList.class));
     }
 
     @Test
-    @DisplayName("쿠폰 정책 단일 조회 - 미존재 예외")
-    void testGetCouponPolicy_NotExists() {
-        Long policyId = 999L;
+    @DisplayName("카테고리 쿠폰 발급 - 정상")
+    void testIssueCategoryCoupon_Success() {
+        Long userNo = 100L;
+        Long categoryId = 20L;
+        IssueCategoryCouponRequestDto requestDto = IssueCategoryCouponRequestDto.builder()
+                .userId(userNo)
+                .couponPolicyId(categoryCouponPolicy.getCouponId())
+                .categoryId(categoryId)
+                .build();
 
-        when(couponPolicyRepository.findById(policyId)).thenReturn(Optional.empty());
+        when(couponPolicyRepository.findById(categoryCouponPolicy.getCouponId())).thenReturn(Optional.of(categoryCouponPolicy));
+        when(couponCategoryRepository.existsByCouponPolicy_CouponIdAndCategoryId(categoryCouponPolicy.getCouponId(), categoryId)).thenReturn(true);
+        when(userCouponListRepository.save(any(UserCouponList.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        CouponNotFoundException exception = assertThrows(CouponNotFoundException.class,
-                () -> couponService.getCouponPolicy(policyId));
+        UserCouponList result = couponService.issueCategoryCoupon(userNo, categoryCouponPolicy.getCouponId(), categoryId);
 
-        assertTrue(exception.getMessage().contains("쿠폰 정책을 찾을 수 없습니다"));
+        assertNotNull(result);
+        assertEquals(userNo, result.getUserNo());
+        assertEquals(categoryCouponPolicy.getCouponId(), result.getCouponPolicy().getCouponId());
 
-        verify(couponPolicyRepository).findById(policyId);
+        verify(couponPolicyRepository).findById(categoryCouponPolicy.getCouponId());
+        verify(couponCategoryRepository).existsByCouponPolicy_CouponIdAndCategoryId(categoryCouponPolicy.getCouponId(), categoryId);
+        verify(userCouponListRepository).save(any(UserCouponList.class));
     }
 
     @Test
-    @DisplayName("모든 쿠폰 정책 조회")
-    void testGetAllCouponPolicies() {
+    @DisplayName("할인 금액 계산 - 도서 쿠폰 적용 가능")
+    void testCalculateDiscountAmount_BookCouponApplicable() {
+        Long userNo = 70L;
+        Long userCouponId = 200L;
+        int orderAmount = 20000;
+        List<Long> bookIdsInOrder = List.of(1L, 101L); // 쿠폰 적용 대상 도서 포함
+        List<Long> categoryIdsInOrder = List.of(10L);
 
+        when(userCouponListRepository.findByUserNoAndUserCouponId(userNo, userCouponId))
+                .thenReturn(Optional.of(UserCouponList.builder()
+                        .userCouponId(userCouponId)
+                        .userNo(userNo)
+                        .couponPolicy(bookCouponPolicy)
+                        .status(UserCouponStatus.ACTIVE)
+                        .expiredAt(LocalDateTime.now().plusDays(10))
+                        .build()));
 
-        List<CouponPolicy> policies = List.of(couponPolicy, bookCouponPolicy, categoryCouponPolicy);
+        when(couponBookRepository.existsByCouponPolicyIdAndBookIdsIn(bookCouponPolicy.getCouponId(), bookIdsInOrder)).thenReturn(true);
 
-        when(couponPolicyRepository.findAll()).thenReturn(policies);
+        int discountAmount = couponService.calculateDiscountAmount(userNo, userCouponId, orderAmount, bookIdsInOrder, categoryIdsInOrder);
 
-        // bookScopePolicy의 bookIds 반환 Stub
-        when(couponBookRepository.findBookIdsByCouponId(bookCouponPolicy.getCouponId()))
-                .thenReturn(List.of(101L, 102L));
+        // bookCouponPolicy의 할인율이 10%이므로 20000 * 0.1 = 2000
+        assertEquals(2000, discountAmount);
 
-        // categoryScopePolicy의 categoryIds 반환 Stub
-        when(couponCategoryRepository.findCategoryIdsByCouponId(categoryCouponPolicy.getCouponId()))
-                .thenReturn(List.of(201L, 202L));
+        verify(userCouponListRepository).findByUserNoAndUserCouponId(userNo, userCouponId);
+        verify(couponBookRepository).existsByCouponPolicyIdAndBookIdsIn(bookCouponPolicy.getCouponId(), bookIdsInOrder);
+    }
 
-        // allScopePolicy는 bookIds, categoryIds 없음 → no stub needed
+    @Test
+    @DisplayName("할인 금액 계산 - 카테고리 쿠폰 적용 가능")
+    void testCalculateDiscountAmount_CategoryCouponApplicable() {
+        Long userNo = 70L;
+        Long userCouponId = 200L;
+        int orderAmount = 20000;
+        List<Long> bookIdsInOrder = List.of(1L, 2L);
+        List<Long> categoryIdsInOrder = List.of(10L, 201L); // 쿠폰 적용 대상 카테고리 포함
 
-        // 실행
-        List<CouponPolicyResponseDto> results = couponService.getAllCouponPolicies();
+        when(userCouponListRepository.findByUserNoAndUserCouponId(userNo, userCouponId))
+                .thenReturn(Optional.of(UserCouponList.builder()
+                        .userCouponId(userCouponId)
+                        .userNo(userNo)
+                        .couponPolicy(categoryCouponPolicy)
+                        .status(UserCouponStatus.ACTIVE)
+                        .expiredAt(LocalDateTime.now().plusDays(10))
+                        .build()));
 
-        // 검증
-        assertNotNull(results);
-        assertEquals(3, results.size());
+        when(couponCategoryRepository.existsByCouponPolicyIdAndCategoryIdsIn(categoryCouponPolicy.getCouponId(), categoryIdsInOrder)).thenReturn(true);
 
-        // bookScopePolicy 검증
-        CouponPolicyResponseDto bscp = results.stream()
-                .filter(dto -> dto.getCouponId().equals(bookCouponPolicy.getCouponId()))
-                .findFirst().orElse(null);
-        assertNotNull(bscp);
-        assertEquals(List.of(101L, 102L), bscp.getBookIds());
-        assertNull(bscp.getCategoryIds());
+        int discountAmount = couponService.calculateDiscountAmount(userNo, userCouponId, orderAmount, bookIdsInOrder, categoryIdsInOrder);
 
-        // categoryScopePolicy 검증
-        CouponPolicyResponseDto cscp = results.stream()
-                .filter(dto -> dto.getCouponId().equals(categoryCouponPolicy.getCouponId()))
-                .findFirst().orElse(null);
-        assertNotNull(cscp);
-        assertEquals(List.of(201L, 202L), cscp.getCategoryIds());
-        assertNull(cscp.getBookIds());
+        // categoryCouponPolicy의 할인율이 10%이므로 20000 * 0.1 = 2000
+        assertEquals(2000, discountAmount);
 
-        // allScopePolicy 검증
-        CouponPolicyResponseDto ascp = results.stream()
-                .filter(dto -> dto.getCouponId().equals(couponPolicy.getCouponId()))
-                .findFirst().orElse(null);
-        assertNotNull(ascp);
-        assertNull(ascp.getBookIds());
-        assertNull(ascp.getCategoryIds());
-
-        verify(couponPolicyRepository).findAll();
-        verify(couponBookRepository).findBookIdsByCouponId(bookCouponPolicy.getCouponId());
-        verify(couponCategoryRepository).findCategoryIdsByCouponId(categoryCouponPolicy.getCouponId());
+        verify(userCouponListRepository).findByUserNoAndUserCouponId(userNo, userCouponId);
+        verify(couponCategoryRepository).existsByCouponPolicyIdAndCategoryIdsIn(categoryCouponPolicy.getCouponId(), categoryIdsInOrder);
     }
 
 
