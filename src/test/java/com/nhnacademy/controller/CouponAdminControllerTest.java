@@ -179,6 +179,64 @@ class CouponAdminControllerTest {
     }
 
     @Test
+    @DisplayName("관리자: 단일 쿠폰 정책 조회 - BOOK 스코프")
+    void testGetCouponPolicyById_BookScope() throws Exception {
+        CouponPolicy couponPolicy = CouponPolicy.builder()
+                .couponId(2L)
+                .couponName("Book Coupon")
+                .couponDiscountType(CouponDiscountType.PERCENT)
+                .couponDiscountAmount(10)
+                .couponMinimumOrderAmount(10000)
+                .couponMaximumDiscountAmount(5000)
+                .couponScope(CouponScope.BOOK)
+                .couponExpiredAt(LocalDateTime.now().plusDays(10))
+                .couponIssuePeriod(30)
+                .couponType(CouponType.GENERAL)
+                .build();
+
+        List<Long> bookIds = Arrays.asList(101L, 102L);
+
+        Mockito.when(couponService.getCouponPolicyById(2L)).thenReturn(Optional.of(couponPolicy));
+        Mockito.when(couponService.getBookIdsByCouponId(2L)).thenReturn(bookIds);
+
+        mockMvc.perform(get("/admin/coupon-policies/{couponId}", 2L))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.couponId").value(2L))
+                .andExpect(jsonPath("$.couponScope").value("BOOK"))
+                .andExpect(jsonPath("$.bookIds[0]").value(101L))
+                .andExpect(jsonPath("$.bookIds[1]").value(102L));
+    }
+
+    @Test
+    @DisplayName("관리자: 단일 쿠폰 정책 조회 - CATEGORY 스코프")
+    void testGetCouponPolicyById_CategoryScope() throws Exception {
+        CouponPolicy couponPolicy = CouponPolicy.builder()
+                .couponId(3L)
+                .couponName("Category Coupon")
+                .couponDiscountType(CouponDiscountType.PERCENT)
+                .couponDiscountAmount(10)
+                .couponMinimumOrderAmount(10000)
+                .couponMaximumDiscountAmount(5000)
+                .couponScope(CouponScope.CATEGORY)
+                .couponExpiredAt(LocalDateTime.now().plusDays(10))
+                .couponIssuePeriod(30)
+                .couponType(CouponType.GENERAL)
+                .build();
+
+        List<Long> categoryIds = Arrays.asList(201L, 202L);
+
+        Mockito.when(couponService.getCouponPolicyById(3L)).thenReturn(Optional.of(couponPolicy));
+        Mockito.when(couponService.getCategoryIdsByCouponId(3L)).thenReturn(categoryIds);
+
+        mockMvc.perform(get("/admin/coupon-policies/{couponId}", 3L))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.couponId").value(3L))
+                .andExpect(jsonPath("$.couponScope").value("CATEGORY"))
+                .andExpect(jsonPath("$.categoryIds[0]").value(201L))
+                .andExpect(jsonPath("$.categoryIds[1]").value(202L));
+    }
+
+    @Test
     @DisplayName("관리자: 쿠폰 정책 삭제")
     void testDeleteCouponPolicy() throws Exception {
         Long couponPolicyId = 1L;

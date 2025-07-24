@@ -19,4 +19,9 @@ public interface CouponCategoryRepository extends JpaRepository<CouponCategory, 
     @Modifying(clearAutomatically = true)
     @Query("delete From CouponCategory cc where cc.couponPolicy = :couponPolicy")
     void deleteByCouponPolicy(CouponPolicy couponPolicy);
+
+    boolean existsByCouponPolicy_CouponIdAndCategoryId(Long couponPolicyId, Long categoryId);
+
+    @Query("SELECT COUNT(cc) > 0 FROM CouponCategory cc WHERE cc.couponPolicy.couponId = :couponPolicyId AND cc.categoryId IN :categoryIds")
+    boolean existsByCouponPolicyIdAndCategoryIdsIn(@Param("couponPolicyId") Long couponPolicyId, @Param("categoryIds") List<Long> categoryIds);
 }

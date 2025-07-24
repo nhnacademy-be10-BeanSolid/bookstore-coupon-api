@@ -63,6 +63,26 @@ class CouponControllerTest {
     }
 
     @Test
+    @DisplayName("쿠폰 정책 생성 - 유효성 검사 실패")
+    void testCreateCouponPolicy_ValidationFailed() throws Exception {
+        CouponPolicyRequestDto invalidRequest = CouponPolicyRequestDto.builder()
+                .couponName("") // Invalid: empty name
+                .couponDiscountType(CouponDiscountType.PERCENT)
+                .couponDiscountAmount(10)
+                .couponMinimumOrderAmount(10000)
+                .couponMaximumDiscountAmount(5000)
+                .couponScope(CouponScope.ALL)
+                .couponIssuePeriod(30)
+                .couponType(CouponType.GENERAL)
+                .build();
+
+        mockMvc.perform(post("/coupons/policy")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(invalidRequest)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     @DisplayName("모든 쿠폰 정책 조회")
     void testGetAllCouponPolicies() throws Exception {
         CouponPolicyResponseDto dto1 = CouponPolicyResponseDto.builder()
