@@ -564,8 +564,6 @@ class CouponServiceImplTest {
     void calculateDiscountAmount_userCouponNotFound() {
         long userNo       = 1L;
         long userCouponId = 99L;
-        int  totalAmount  = 10_000;
-
         when(userCouponListRepository.findByUserNoAndUserCouponId(userNo, userCouponId))
                 .thenReturn(Optional.empty());
         assertThatThrownBy(this::invokeCalculateDiscountNotFound)
