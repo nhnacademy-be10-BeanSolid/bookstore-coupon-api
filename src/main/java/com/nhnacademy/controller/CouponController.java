@@ -86,7 +86,6 @@ public class CouponController implements CouponControllerDoc {
         UserCouponList issuedCoupon = couponService.issueBookCoupon(request);
         return new ResponseEntity<>(UserCouponResponseDto.from(issuedCoupon), HttpStatus.CREATED);
     }
-
     @Override
     @PostMapping("/issue/category")
     public ResponseEntity<UserCouponResponseDto> issueCategoryCoupon(@RequestBody IssueCategoryCouponRequestDto request) {
