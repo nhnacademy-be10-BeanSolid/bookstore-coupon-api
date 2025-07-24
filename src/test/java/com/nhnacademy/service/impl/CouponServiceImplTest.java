@@ -562,27 +562,55 @@ class CouponServiceImplTest {
     @Test
     @DisplayName("할인 금액 계산 - 실패 (쿠폰 찾을 수 없음)")
     void calculateDiscountAmount_userCouponNotFound() {
-        when(userCouponListRepository.findByUserNoAndUserCouponId(anyLong(), anyLong())).thenReturn(Optional.empty());
+        long userNo       = 1L;
+        long userCouponId = 99L;
+        int totalAmount   = 10_000;
 
-        assertThatThrownBy(() -> couponService.calculateDiscountAmount(1L, 99L, 10000, Collections.emptyList(), Collections.emptyList()))
+        when(userCouponListRepository.findByUserNoAndUserCouponId(userNo, userCouponId))
+                .thenReturn(Optional.empty());
+
+        assertThatThrownBy(() ->
+                couponService.calculateDiscountAmount(
+                        userNo,
+                        userCouponId,
+                        totalAmount,
+                        Collections.emptyList(),
+                        Collections.emptyList()
+                )
+        )
                 .isInstanceOf(UserCouponNotFoundException.class);
-        verify(userCouponListRepository, times(1)).findByUserNoAndUserCouponId(anyLong(), anyLong());
-    }
 
+        verify(userCouponListRepository, times(1))
+                .findByUserNoAndUserCouponId(anyLong(), anyLong());
+    }
 
 
     @Test
     @DisplayName("할인 금액 계산 - 실패 (쿠폰 만료)")
     void calculateDiscountAmount_expiredCoupon() {
-        testUserCoupon.setExpiredAt(LocalDateTime.now().minusDays(1));
-        when(userCouponListRepository.findByUserNoAndUserCouponId(anyLong(), anyLong())).thenReturn(Optional.of(testUserCoupon));
+        // given
+        long userNo       = 1L;
+        long userCouponId = 1L;
+        int  totalAmount  = 10_000;
 
-        assertThatThrownBy(() -> couponService.calculateDiscountAmount(1L, 1L, 10000, Collections.emptyList(), Collections.emptyList()))
+        testUserCoupon.setExpiredAt(LocalDateTime.now().minusDays(1));
+        when(userCouponListRepository.findByUserNoAndUserCouponId(userNo, userCouponId))
+                .thenReturn(Optional.of(testUserCoupon));
+        assertThatThrownBy(() ->
+                couponService.calculateDiscountAmount(
+                        userNo,
+                        userCouponId,
+                        totalAmount,
+                        Collections.emptyList(),
+                        Collections.emptyList()
+                )
+        )
                 .isInstanceOf(CouponExpiredException.class)
                 .hasMessageContaining("만료된 쿠폰입니다.");
-        verify(userCouponListRepository, times(1)).findByUserNoAndUserCouponId(anyLong(), anyLong());
-    }
 
+        verify(userCouponListRepository, times(1))
+                .findByUserNoAndUserCouponId(anyLong(), anyLong());
+    }
 
     @Test
     @DisplayName("할인 금액 계산 - 실패 (도서 범위 쿠폰, 주문에 해당 도서 없음)")

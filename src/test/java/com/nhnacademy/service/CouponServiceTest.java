@@ -452,39 +452,53 @@ class CouponServiceTest {
                 .couponPolicyId(999L)
                 .categoryId(1L)
                 .build();
-
-        assertThrows(CouponNotFoundException.class, () -> couponService.issueCategoryCoupon(requestDto.getUserId(), requestDto.getCouponPolicyId(), requestDto.getCategoryId()));
+        Long userId     = requestDto.getUserId();
+        Long policyId   = requestDto.getCouponPolicyId();
+        Long categoryId = requestDto.getCategoryId();
+        assertThrows(CouponNotFoundException.class,
+                () -> couponService.issueCategoryCoupon(userId, policyId, categoryId)
+        );
     }
 
     @Test
     @DisplayName("카테고리 쿠폰 발급 - 스코프가 CATEGORY 아닐 경우 예외")
     void testIssueCategoryCoupon_NotCategoryScope() {
-        when(couponPolicyRepository.findById(bookCouponPolicy.getCouponId())).thenReturn(Optional.of(bookCouponPolicy));
+        Long policyId   = bookCouponPolicy.getCouponId();
+        Long userId     = 1L;
+        Long categoryId = 1L;
+        when(couponPolicyRepository.findById(policyId))
+                .thenReturn(Optional.of(bookCouponPolicy));
 
         IssueCategoryCouponRequestDto requestDto = IssueCategoryCouponRequestDto.builder()
-                .userId(1L)
-                .couponPolicyId(bookCouponPolicy.getCouponId())
-                .categoryId(1L)
+                .userId(userId)
+                .couponPolicyId(policyId)
+                .categoryId(categoryId)
                 .build();
 
         assertThrows(CouponNotApplicableException.class,
-                () -> couponService.issueCategoryCoupon(requestDto.getUserId(), requestDto.getCouponPolicyId(), requestDto.getCategoryId()));
+                () -> couponService.issueCategoryCoupon(userId, policyId, categoryId)
+        );
     }
 
     @Test
     @DisplayName("카테고리 쿠폰 발급 - 적용 카테고리 아닐 때 예외")
     void testIssueCategoryCoupon_NotApplicableCategory() {
-        when(couponPolicyRepository.findById(categoryCouponPolicy.getCouponId())).thenReturn(Optional.of(categoryCouponPolicy));
-        when(couponCategoryRepository.existsByCouponPolicy_CouponIdAndCategoryId(categoryCouponPolicy.getCouponId(), 999L)).thenReturn(false);
-
+        Long policyId   = categoryCouponPolicy.getCouponId();
+        Long userId     = 1L;
+        Long invalidCategoryId = 999L;
+        when(couponPolicyRepository.findById(policyId))
+                .thenReturn(Optional.of(categoryCouponPolicy));
+        when(couponCategoryRepository
+                .existsByCouponPolicy_CouponIdAndCategoryId(policyId, invalidCategoryId))
+                .thenReturn(false);
         IssueCategoryCouponRequestDto requestDto = IssueCategoryCouponRequestDto.builder()
-                .userId(1L)
-                .couponPolicyId(categoryCouponPolicy.getCouponId())
-                .categoryId(999L)
+                .userId(userId)
+                .couponPolicyId(policyId)
+                .categoryId(invalidCategoryId)
                 .build();
-
         assertThrows(CouponNotApplicableException.class,
-                () -> couponService.issueCategoryCoupon(requestDto.getUserId(), requestDto.getCouponPolicyId(), requestDto.getCategoryId()));
+                () -> couponService.issueCategoryCoupon(userId, policyId, invalidCategoryId)
+        );
     }
 
     @Test
@@ -982,26 +996,27 @@ class CouponServiceTest {
     @Test
     @DisplayName("카테고리 쿠폰 발급 - 정상")
     void testIssueCategoryCoupon_Success() {
-        Long userNo = 100L;
+        Long userNo     = 100L;
+        Long policyId   = categoryCouponPolicy.getCouponId();
         Long categoryId = 20L;
-        IssueCategoryCouponRequestDto requestDto = IssueCategoryCouponRequestDto.builder()
-                .userId(userNo)
-                .couponPolicyId(categoryCouponPolicy.getCouponId())
-                .categoryId(categoryId)
-                .build();
 
-        when(couponPolicyRepository.findById(categoryCouponPolicy.getCouponId())).thenReturn(Optional.of(categoryCouponPolicy));
-        when(couponCategoryRepository.existsByCouponPolicy_CouponIdAndCategoryId(categoryCouponPolicy.getCouponId(), categoryId)).thenReturn(true);
-        when(userCouponListRepository.save(any(UserCouponList.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(couponPolicyRepository.findById(policyId))
+                .thenReturn(Optional.of(categoryCouponPolicy));
+        when(couponCategoryRepository
+                .existsByCouponPolicy_CouponIdAndCategoryId(policyId, categoryId))
+                .thenReturn(true);
+        when(userCouponListRepository.save(any(UserCouponList.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
 
-        UserCouponList result = couponService.issueCategoryCoupon(userNo, categoryCouponPolicy.getCouponId(), categoryId);
+        UserCouponList result = couponService.issueCategoryCoupon(userNo, policyId, categoryId);
 
         assertNotNull(result);
         assertEquals(userNo, result.getUserNo());
-        assertEquals(categoryCouponPolicy.getCouponId(), result.getCouponPolicy().getCouponId());
+        assertEquals(policyId, result.getCouponPolicy().getCouponId());
 
-        verify(couponPolicyRepository).findById(categoryCouponPolicy.getCouponId());
-        verify(couponCategoryRepository).existsByCouponPolicy_CouponIdAndCategoryId(categoryCouponPolicy.getCouponId(), categoryId);
+        verify(couponPolicyRepository).findById(policyId);
+        verify(couponCategoryRepository)
+                .existsByCouponPolicy_CouponIdAndCategoryId(policyId, categoryId);
         verify(userCouponListRepository).save(any(UserCouponList.class));
     }
 
