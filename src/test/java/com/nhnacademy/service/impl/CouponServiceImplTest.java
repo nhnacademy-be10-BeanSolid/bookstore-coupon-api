@@ -586,23 +586,14 @@ class CouponServiceImplTest {
     @Test
     @DisplayName("할인 금액 계산 - 실패 (쿠폰 만료)")
     void calculateDiscountAmount_expiredCoupon() {
-        // given
         long userNo       = 1L;
         long userCouponId = 1L;
-        int  totalAmount  = 10_000;
 
         testUserCoupon.setExpiredAt(LocalDateTime.now().minusDays(1));
         when(userCouponListRepository.findByUserNoAndUserCouponId(userNo, userCouponId))
                 .thenReturn(Optional.of(testUserCoupon));
-        assertThatThrownBy(() ->
-                couponService.calculateDiscountAmount(
-                        userNo,
-                        userCouponId,
-                        totalAmount,
-                        Collections.emptyList(),
-                        Collections.emptyList()
-                )
-        )
+
+        assertThatThrownBy(this::invokeCalculate)
                 .isInstanceOf(CouponExpiredException.class)
                 .hasMessageContaining("만료된 쿠폰입니다.");
 
@@ -610,6 +601,15 @@ class CouponServiceImplTest {
                 .findByUserNoAndUserCouponId(anyLong(), anyLong());
     }
 
+    private void invokeCalculate() {
+        couponService.calculateDiscountAmount(
+                1L,
+               1L,
+                10_000,
+                Collections.emptyList(),
+                Collections.emptyList()
+        );
+    }
     @Test
     @DisplayName("할인 금액 계산 - 실패 (도서 범위 쿠폰, 주문에 해당 도서 없음)")
     void calculateDiscountAmount_bookScope_bookNotIncluded() {
