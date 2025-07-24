@@ -681,7 +681,6 @@ class CouponServiceImplTest {
                 1L
         );
     }
-
     @Test
     @DisplayName("도서에 쿠폰 발행 - 성공")
     void issueCouponToBook_success() {
