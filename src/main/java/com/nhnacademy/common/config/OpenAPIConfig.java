@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 public class OpenAPIConfig {
 
     @Bean
-    public OpenAPI SwaggerConfig() {
+    public OpenAPI swaggerConfig() {
         return new OpenAPI()
                 .info(new Info()
                         .title("NHN Bookstore Coupon API")
