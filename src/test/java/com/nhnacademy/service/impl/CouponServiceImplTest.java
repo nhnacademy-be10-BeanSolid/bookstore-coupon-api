@@ -583,35 +583,30 @@ class CouponServiceImplTest {
         verify(userCouponListRepository, times(1)).findByUserNoAndUserCouponId(anyLong(), anyLong());
     }
 
+
     @Test
-    @DisplayName("할인 금액 계산 - 실패 (최소 주문 금액 미달)")
-    void calculateDiscountAmount_minimumOrderAmountNotMet() {
-        // given
-        testUserCoupon.getCouponPolicy().setCouponMinimumOrderAmount(20000); // 최소 주문 금액 20000원
+    @DisplayName("할인 금액 계산 - 실패 (도서 범위 쿠폰, 주문에 해당 도서 없음)")
+    void calculateDiscountAmount_bookScope_bookNotIncluded() {
+        testUserCoupon.getCouponPolicy().setCouponScope(CouponScope.BOOK);
         when(userCouponListRepository.findByUserNoAndUserCouponId(anyLong(), anyLong()))
                 .thenReturn(Optional.of(testUserCoupon));
-
-        // — 람다 밖에서 미리 인자 준비 —
-        long userNo      = 1L;
-        long userCouponId= 1L;
-        int  orderAmount = 10_000;
-        List<Long> itemIds = Collections.emptyList();
-        List<Long> scopeIds= Collections.emptyList();
-
+        when(couponBookRepository.existsByCouponPolicyIdAndBookIdsIn(anyLong(), anyList()))
+                .thenReturn(false);
+        List<Long> itemIds  = List.of(999L);
+        List<Long> bookIds  = Collections.emptyList();
         assertThatThrownBy(() ->
                 couponService.calculateDiscountAmount(
-                        userNo,
-                        userCouponId,
-                        orderAmount,
+                        1L,
+                        1L,
+                        10000,
                         itemIds,
-                        scopeIds
+                        bookIds
                 )
         )
                 .isInstanceOf(CouponNotApplicableException.class)
-                .hasMessageContaining("최소 주문 금액 조건을 만족하지 않습니다.");
-
-        verify(userCouponListRepository, times(1))
-                .findByUserNoAndUserCouponId(anyLong(), anyLong());
+                .hasMessageContaining("주문에 쿠폰 적용 대상 도서가 포함되어 있지 않습니다.");
+        verify(userCouponListRepository, times(1)).findByUserNoAndUserCouponId(anyLong(), anyLong());
+        verify(couponBookRepository, times(1)).existsByCouponPolicyIdAndBookIdsIn(anyLong(), anyList());
     }
 
     @Test
