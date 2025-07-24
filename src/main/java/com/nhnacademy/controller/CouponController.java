@@ -9,6 +9,14 @@ import com.nhnacademy.dto.response.UserCouponResponseDto;
 import com.nhnacademy.domain.CouponPolicy;
 import com.nhnacademy.controller.swagger.CouponControllerDoc;
 import com.nhnacademy.domain.UserCouponList;
+import com.nhnacademy.domain.CouponPolicy;
+import com.nhnacademy.domain.UserCouponList;
+import com.nhnacademy.dto.request.CouponPolicyRequestDto;
+import com.nhnacademy.dto.request.CouponUseRequestDto;
+import com.nhnacademy.dto.request.IssueBookCouponRequestDto;
+import com.nhnacademy.dto.request.IssueCategoryCouponRequestDto;
+import com.nhnacademy.dto.response.CouponPolicyResponseDto;
+import com.nhnacademy.dto.response.UserCouponResponseDto;
 import com.nhnacademy.service.CouponService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -80,6 +88,12 @@ public class CouponController implements CouponControllerDoc {
     }
 
     @Override
+    @PostMapping("/issue/category")
+    public ResponseEntity<UserCouponResponseDto> issueCategoryCoupon(@RequestBody IssueCategoryCouponRequestDto request) {
+        UserCouponList issuedCoupon = couponService.issueCategoryCoupon(request.getUserId(), request.getCouponPolicyId(), request.getCategoryId());
+        return new ResponseEntity<>(UserCouponResponseDto.from(issuedCoupon), HttpStatus.CREATED);
+    }
+
     @GetMapping("/users/{userNo}/active")
     public ResponseEntity<List<UserCouponResponseDto>> getActiveUserCoupons(@PathVariable Long userNo) {
         log.info("CouponController: getActiveUserCoupons for userNo {}", userNo);

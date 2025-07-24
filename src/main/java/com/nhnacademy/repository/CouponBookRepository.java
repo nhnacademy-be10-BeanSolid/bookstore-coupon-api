@@ -17,4 +17,7 @@ public interface CouponBookRepository extends JpaRepository<CouponBook, Long>, C
     List<Long> findBookIdsByCouponId(@Param("couponId") Long couponId);
 
     void deleteByCouponPolicy(com.nhnacademy.domain.CouponPolicy couponPolicy);
+
+    @Query("SELECT COUNT(cb) > 0 FROM CouponBook cb WHERE cb.couponPolicy.couponId = :couponPolicyId AND cb.bookId IN :bookIds")
+    boolean existsByCouponPolicyIdAndBookIdsIn(@Param("couponPolicyId") Long couponPolicyId, @Param("bookIds") List<Long> bookIds);
 }
