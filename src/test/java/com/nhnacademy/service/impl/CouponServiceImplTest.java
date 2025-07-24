@@ -583,8 +583,6 @@ class CouponServiceImplTest {
         verify(userCouponListRepository, times(1))
                 .findByUserNoAndUserCouponId(anyLong(), anyLong());
     }
-
-
     @Test
     @DisplayName("할인 금액 계산 - 실패 (쿠폰 만료)")
     void calculateDiscountAmount_expiredCoupon() {
