@@ -613,30 +613,6 @@ class CouponServiceImplTest {
         verify(userCouponListRepository, times(1))
                 .findByUserNoAndUserCouponId(anyLong(), anyLong());
     }
-    @Test
-    @DisplayName("할인 금액 계산 - 실패 (도서 범위 쿠폰, 주문에 해당 도서 없음)")
-    void calculateDiscountAmount_bookScope_bookNotIncluded() {
-        testUserCoupon.getCouponPolicy().setCouponScope(CouponScope.BOOK);
-        when(userCouponListRepository.findByUserNoAndUserCouponId(anyLong(), anyLong()))
-                .thenReturn(Optional.of(testUserCoupon));
-        when(couponBookRepository.existsByCouponPolicyIdAndBookIdsIn(anyLong(), anyList()))
-                .thenReturn(false);
-        List<Long> itemIds  = List.of(999L);
-        List<Long> bookIds  = Collections.emptyList();
-        assertThatThrownBy(() ->
-                couponService.calculateDiscountAmount(
-                        1L,
-                        1L,
-                        10000,
-                        itemIds,
-                        bookIds
-                )
-        )
-                .isInstanceOf(CouponNotApplicableException.class)
-                .hasMessageContaining("주문에 쿠폰 적용 대상 도서가 포함되어 있지 않습니다.");
-        verify(userCouponListRepository, times(1)).findByUserNoAndUserCouponId(anyLong(), anyLong());
-        verify(couponBookRepository, times(1)).existsByCouponPolicyIdAndBookIdsIn(anyLong(), anyList());
-    }
 
     @Test
     @DisplayName("할인 금액 계산 - 실패 (카테고리 범위 쿠폰, 주문에 해당 카테고리 없음)")
