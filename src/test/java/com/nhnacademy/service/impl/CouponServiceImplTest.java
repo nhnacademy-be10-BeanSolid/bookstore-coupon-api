@@ -564,24 +564,24 @@ class CouponServiceImplTest {
     void calculateDiscountAmount_userCouponNotFound() {
         long userNo       = 1L;
         long userCouponId = 99L;
-        int totalAmount   = 10_000;
+        int  totalAmount  = 10_000;
 
         when(userCouponListRepository.findByUserNoAndUserCouponId(userNo, userCouponId))
                 .thenReturn(Optional.empty());
-
-        assertThatThrownBy(() ->
-                couponService.calculateDiscountAmount(
-                        userNo,
-                        userCouponId,
-                        totalAmount,
-                        Collections.emptyList(),
-                        Collections.emptyList()
-                )
-        )
+        assertThatThrownBy(this::invokeCalculateDiscountNotFound)
                 .isInstanceOf(UserCouponNotFoundException.class);
 
         verify(userCouponListRepository, times(1))
                 .findByUserNoAndUserCouponId(anyLong(), anyLong());
+    }
+    private void invokeCalculateDiscountNotFound() {
+        couponService.calculateDiscountAmount(
+                1L,
+                99L,
+                10_000,
+                Collections.emptyList(),
+                Collections.emptyList()
+        );
     }
     @Test
     @DisplayName("할인 금액 계산 - 실패 (쿠폰 만료)")
