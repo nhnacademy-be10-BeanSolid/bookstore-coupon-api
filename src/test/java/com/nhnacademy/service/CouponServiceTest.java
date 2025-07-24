@@ -820,7 +820,7 @@ class CouponServiceTest {
         Long userCouponId = 200L;
         int orderAmount = 20000;
         List<Long> bookIds = List.of(1L, 2L);
-        List<Long> categoryIds = List.of(20L, 30L); // 적용 안되는 카테고리
+        List<Long> categoryIds = List.of(20L, 30L);
 
         when(userCouponListRepository.findByUserNoAndUserCouponId(userNo, userCouponId))
                 .thenReturn(Optional.of(UserCouponList.builder()
@@ -1011,7 +1011,7 @@ class CouponServiceTest {
         Long userNo = 70L;
         Long userCouponId = 200L;
         int orderAmount = 20000;
-        List<Long> bookIdsInOrder = List.of(1L, 101L); // 쿠폰 적용 대상 도서 포함
+        List<Long> bookIdsInOrder = List.of(1L, 101L);
         List<Long> categoryIdsInOrder = List.of(10L);
 
         when(userCouponListRepository.findByUserNoAndUserCouponId(userNo, userCouponId))
@@ -1027,7 +1027,6 @@ class CouponServiceTest {
 
         int discountAmount = couponService.calculateDiscountAmount(userNo, userCouponId, orderAmount, bookIdsInOrder, categoryIdsInOrder);
 
-        // bookCouponPolicy의 할인율이 10%이므로 20000 * 0.1 = 2000
         assertEquals(2000, discountAmount);
 
         verify(userCouponListRepository).findByUserNoAndUserCouponId(userNo, userCouponId);
@@ -1041,7 +1040,7 @@ class CouponServiceTest {
         Long userCouponId = 200L;
         int orderAmount = 20000;
         List<Long> bookIdsInOrder = List.of(1L, 2L);
-        List<Long> categoryIdsInOrder = List.of(10L, 201L); // 쿠폰 적용 대상 카테고리 포함
+        List<Long> categoryIdsInOrder = List.of(10L, 201L);
 
         when(userCouponListRepository.findByUserNoAndUserCouponId(userNo, userCouponId))
                 .thenReturn(Optional.of(UserCouponList.builder()
@@ -1056,7 +1055,6 @@ class CouponServiceTest {
 
         int discountAmount = couponService.calculateDiscountAmount(userNo, userCouponId, orderAmount, bookIdsInOrder, categoryIdsInOrder);
 
-        // categoryCouponPolicy의 할인율이 10%이므로 20000 * 0.1 = 2000
         assertEquals(2000, discountAmount);
 
         verify(userCouponListRepository).findByUserNoAndUserCouponId(userNo, userCouponId);

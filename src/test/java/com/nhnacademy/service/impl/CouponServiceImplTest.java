@@ -376,13 +376,19 @@ class CouponServiceImplTest {
     @Test
     @DisplayName("생일 쿠폰 발급 - 실패 (정책 없음)")
     void issueBirthdayCoupon_policyNotFound() {
-        when(couponPolicyRepository.findByCouponType(CouponType.BIRTHDAY)).thenReturn(Optional.empty());
-
-        assertThatThrownBy(() -> couponService.issueBirthdayCoupon(1L, LocalDate.of(2000, 7, 23)))
+        when(couponPolicyRepository.findByCouponType(CouponType.BIRTHDAY))
+                .thenReturn(Optional.empty());
+        long    userNo   = 1L;
+        LocalDate birthday = LocalDate.of(2000, 7, 23);
+        assertThatThrownBy(() ->
+                couponService.issueBirthdayCoupon(userNo, birthday)
+        )
                 .isInstanceOf(CouponNotFoundException.class)
                 .hasMessageContaining("Birthday 쿠폰 정책을 찾을 수 없습니다.");
+
         verify(couponPolicyRepository, times(1)).findByCouponType(CouponType.BIRTHDAY);
-        verify(userCouponListRepository, never()).findByUserNoAndCouponPolicy(anyLong(), any(CouponPolicy.class));
+        verify(userCouponListRepository, never())
+                .findByUserNoAndCouponPolicy(anyLong(), any(CouponPolicy.class));
     }
 
     @Test
@@ -402,14 +408,20 @@ class CouponServiceImplTest {
                 .issuedAt(LocalDateTime.now())
                 .build();
 
-        when(couponPolicyRepository.findByCouponType(CouponType.BIRTHDAY)).thenReturn(Optional.of(birthdayPolicy));
-        when(userCouponListRepository.findByUserNoAndCouponPolicy(anyLong(), any(CouponPolicy.class))).thenReturn(List.of(issuedThisYear));
-
-        assertThatThrownBy(() -> couponService.issueBirthdayCoupon(1L, LocalDate.of(2000, 7, 23)))
+        when(couponPolicyRepository.findByCouponType(CouponType.BIRTHDAY))
+                .thenReturn(Optional.of(birthdayPolicy));
+        when(userCouponListRepository.findByUserNoAndCouponPolicy(anyLong(), any(CouponPolicy.class)))
+                .thenReturn(List.of(issuedThisYear));
+        long    userNo    = 1L;
+        LocalDate birthday = LocalDate.of(2000, 7, 23);
+        assertThatThrownBy(() ->
+                couponService.issueBirthdayCoupon(userNo, birthday)
+        )
                 .isInstanceOf(CouponAlreadyExistException.class)
                 .hasMessageContaining("이번 연도 생일 쿠폰이 이미 발급되었습니다.");
         verify(couponPolicyRepository, times(1)).findByCouponType(CouponType.BIRTHDAY);
-        verify(userCouponListRepository, times(1)).findByUserNoAndCouponPolicy(anyLong(), any(CouponPolicy.class));
+        verify(userCouponListRepository, times(1))
+                .findByUserNoAndCouponPolicy(userNo, birthdayPolicy);
         verify(userCouponListRepository, never()).save(any(UserCouponList.class));
     }
 
@@ -574,23 +586,52 @@ class CouponServiceImplTest {
     @Test
     @DisplayName("할인 금액 계산 - 실패 (최소 주문 금액 미달)")
     void calculateDiscountAmount_minimumOrderAmountNotMet() {
-        testUserCoupon.getCouponPolicy().setCouponMinimumOrderAmount(20000); // Min 20000
-        when(userCouponListRepository.findByUserNoAndUserCouponId(anyLong(), anyLong())).thenReturn(Optional.of(testUserCoupon));
+        // given
+        testUserCoupon.getCouponPolicy().setCouponMinimumOrderAmount(20000); // 최소 주문 금액 20000원
+        when(userCouponListRepository.findByUserNoAndUserCouponId(anyLong(), anyLong()))
+                .thenReturn(Optional.of(testUserCoupon));
 
-        assertThatThrownBy(() -> couponService.calculateDiscountAmount(1L, 1L, 10000, Collections.emptyList(), Collections.emptyList()))
+        // — 람다 밖에서 미리 인자 준비 —
+        long userNo      = 1L;
+        long userCouponId= 1L;
+        int  orderAmount = 10_000;
+        List<Long> itemIds = Collections.emptyList();
+        List<Long> scopeIds= Collections.emptyList();
+
+        assertThatThrownBy(() ->
+                couponService.calculateDiscountAmount(
+                        userNo,
+                        userCouponId,
+                        orderAmount,
+                        itemIds,
+                        scopeIds
+                )
+        )
                 .isInstanceOf(CouponNotApplicableException.class)
-                .hasMessageContaining("최소 주문 금액");
-        verify(userCouponListRepository, times(1)).findByUserNoAndUserCouponId(anyLong(), anyLong());
-    }
+                .hasMessageContaining("최소 주문 금액 조건을 만족하지 않습니다.");
 
+        verify(userCouponListRepository, times(1))
+                .findByUserNoAndUserCouponId(anyLong(), anyLong());
+    }
     @Test
     @DisplayName("할인 금액 계산 - 실패 (도서 범위 쿠폰, 주문에 해당 도서 없음)")
     void calculateDiscountAmount_bookScope_bookNotIncluded() {
         testUserCoupon.getCouponPolicy().setCouponScope(CouponScope.BOOK);
-        when(userCouponListRepository.findByUserNoAndUserCouponId(anyLong(), anyLong())).thenReturn(Optional.of(testUserCoupon));
-        when(couponBookRepository.existsByCouponPolicyIdAndBookIdsIn(anyLong(), anyList())).thenReturn(false);
-
-        assertThatThrownBy(() -> couponService.calculateDiscountAmount(1L, 1L, 10000, List.of(999L), Collections.emptyList()))
+        when(userCouponListRepository.findByUserNoAndUserCouponId(anyLong(), anyLong()))
+                .thenReturn(Optional.of(testUserCoupon));
+        when(couponBookRepository.existsByCouponPolicyIdAndBookIdsIn(anyLong(), anyList()))
+                .thenReturn(false);
+        List<Long> itemIds  = List.of(999L);
+        List<Long> bookIds  = Collections.emptyList();
+        assertThatThrownBy(() ->
+                couponService.calculateDiscountAmount(
+                        1L,
+                        1L,
+                        10000,
+                        itemIds,
+                        bookIds
+                )
+        )
                 .isInstanceOf(CouponNotApplicableException.class)
                 .hasMessageContaining("주문에 쿠폰 적용 대상 도서가 포함되어 있지 않습니다.");
         verify(userCouponListRepository, times(1)).findByUserNoAndUserCouponId(anyLong(), anyLong());
@@ -600,15 +641,29 @@ class CouponServiceImplTest {
     @Test
     @DisplayName("할인 금액 계산 - 실패 (카테고리 범위 쿠폰, 주문에 해당 카테고리 없음)")
     void calculateDiscountAmount_categoryScope_categoryNotIncluded() {
-        testUserCoupon.getCouponPolicy().setCouponScope(CouponScope.CATEGORY);
-        when(userCouponListRepository.findByUserNoAndUserCouponId(anyLong(), anyLong())).thenReturn(Optional.of(testUserCoupon));
-        when(couponCategoryRepository.existsByCouponPolicyIdAndCategoryIdsIn(anyLong(), anyList())).thenReturn(false);
 
-        assertThatThrownBy(() -> couponService.calculateDiscountAmount(1L, 1L, 10000, Collections.emptyList(), List.of(999L)))
+        testUserCoupon.getCouponPolicy().setCouponScope(CouponScope.CATEGORY);
+        when(userCouponListRepository.findByUserNoAndUserCouponId(anyLong(), anyLong()))
+                .thenReturn(Optional.of(testUserCoupon));
+        when(couponCategoryRepository.existsByCouponPolicyIdAndCategoryIdsIn(anyLong(), anyList()))
+                .thenReturn(false);
+        List<Long> productIds  = Collections.emptyList();
+        List<Long> categoryIds = List.of(999L);
+        assertThatThrownBy(() ->
+                couponService.calculateDiscountAmount(
+                        1L,
+                        1L,
+                        10000,
+                        productIds,
+                        categoryIds
+                )
+        )
                 .isInstanceOf(CouponNotApplicableException.class)
                 .hasMessageContaining("주문에 쿠폰 적용 대상 카테고리가 포함되어 있지 않습니다.");
-        verify(userCouponListRepository, times(1)).findByUserNoAndUserCouponId(anyLong(), anyLong());
-        verify(couponCategoryRepository, times(1)).existsByCouponPolicyIdAndCategoryIdsIn(anyLong(), anyList());
+        verify(userCouponListRepository, times(1))
+                .findByUserNoAndUserCouponId(anyLong(), anyLong());
+        verify(couponCategoryRepository, times(1))
+                .existsByCouponPolicyIdAndCategoryIdsIn(anyLong(), anyList());
     }
 
     @Test
@@ -621,22 +676,11 @@ class CouponServiceImplTest {
 
         verify(couponPolicyRepository, times(1)).findById(anyLong());
         verify(rabbitTemplate, times(1)).convertAndSend(
-                eq(RabbitMQConfig.COUPON_ISSUING_STARTED_EXCHANGE),
-                eq(RabbitMQConfig.COUPON_ISSUING_STARTED_ROUTING_KEY),
-                eq(1L)
+                RabbitMQConfig.COUPON_ISSUING_STARTED_EXCHANGE,
+                RabbitMQConfig.COUPON_ISSUING_STARTED_ROUTING_KEY,
+                1L
         );
     }
-
-//    @Test
-//    @DisplayName("쿠폰 발행 프로세스 시작 - 실패 (정책 없음)")
-//    void startCouponIssuingProcess_policyNotFound() {
-//        when(couponPolicyRepository.findById(anyLong())).thenReturn(Optional.empty());
-//
-//        assertThatThrownBy(() -> couponService.startCouponIssuingProcess(99L))
-//                .isInstanceOf(CouponNotFoundException.class);
-//        verify(couponPolicyRepository, times(1)).findById(anyLong());
-//        verify(rabbitTemplate, never()).convertAndSend(anyString(), anyString(), any());
-//    }
 
     @Test
     @DisplayName("도서에 쿠폰 발행 - 성공")
