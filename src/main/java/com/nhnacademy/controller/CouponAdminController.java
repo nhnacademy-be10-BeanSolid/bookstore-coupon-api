@@ -1,6 +1,7 @@
 package com.nhnacademy.controller;
 
 import com.nhnacademy.common.exception.ValidationFailedException;
+import com.nhnacademy.controller.swagger.CouponAdminControllerDoc;
 import com.nhnacademy.domain.CouponPolicy;
 import com.nhnacademy.domain.enumtype.CouponScope;
 import com.nhnacademy.dto.response.CouponPolicyResponseDto;
@@ -18,45 +19,49 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/admin")
 @RequiredArgsConstructor
-public class CouponAdminController {
+public class CouponAdminController implements CouponAdminControllerDoc {
 
     private final CouponService couponService;
 
+    @Override
     @PostMapping("/issue-all/{couponPolicyId}")
     public ResponseEntity<Void> startIssuingCouponsToAllUsers(@PathVariable Long couponPolicyId) {
         couponService.startCouponIssuingProcess(couponPolicyId);
         return ResponseEntity.accepted().build();
     }
 
+    @Override
     @PostMapping("/issue-book")
     public ResponseEntity<Void> issueCouponToBook(@RequestParam Long couponPolicyId, @RequestParam Long bookId) {
         couponService.issueCouponToBook(couponPolicyId, bookId);
         return ResponseEntity.accepted().build();
     }
 
+    @Override
     @PostMapping("/issue-to-user")
     public ResponseEntity<Void> issueCouponToUser(@RequestParam Long userNo, @RequestParam Long couponPolicyId) {
         couponService.issueCouponToUser(userNo, couponPolicyId);
         return ResponseEntity.accepted().build();
     }
 
+    @Override
     @PostMapping("/coupon-policies")
     public ResponseEntity<Void> createCouponPolicy(@Valid @RequestBody CouponPolicyRequestDto request, BindingResult bindingResult) {
-
-        if(bindingResult.hasErrors()) {
+        if (bindingResult.hasErrors()) {
             throw new ValidationFailedException(bindingResult);
         }
-
         couponService.createCouponPolicy(request);
         return ResponseEntity.ok().build();
     }
 
+    @Override
     @GetMapping("/coupon-policies")
     public ResponseEntity<List<CouponPolicyResponseDto>> getAllCouponPolicies() {
         List<CouponPolicyResponseDto> policies = couponService.getAllCouponPolicies();
         return ResponseEntity.ok(policies);
     }
 
+    @Override
     @GetMapping("/coupon-policies/{couponId}")
     public ResponseEntity<CouponPolicyResponseDto> getCouponPolicyById(@PathVariable Long couponId) {
         Optional<CouponPolicy> policy = couponService.getCouponPolicyById(couponId);
@@ -86,10 +91,10 @@ public class CouponAdminController {
         }).orElse(ResponseEntity.notFound().build());
     }
 
+    @Override
     @DeleteMapping("/coupon-policies/{couponId}")
     public ResponseEntity<Void> deleteCouponPolicy(@PathVariable Long couponId) {
         couponService.deleteCouponPolicy(couponId);
         return ResponseEntity.noContent().build();
     }
-
 }
