@@ -47,4 +47,6 @@ public interface CouponService {
     void startCouponIssuingProcess(Long couponPolicyId);
 
     void issueCouponToBook(Long couponPolicyId, Long bookId);
+
+    UserCouponList issueCategoryCoupon(Long userNo, Long couponPolicyId, Long categoryId);
 }

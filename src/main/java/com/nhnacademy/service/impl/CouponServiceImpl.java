@@ -145,7 +145,24 @@ public class CouponServiceImpl implements CouponService {
             throw new CouponNotApplicableException("해당 도서에 적용되는 쿠폰 정책이 아닙니다. Policy ID: " + request.getCouponPolicyId() + ", Book ID: " + request.getBookId());
         }
 
-        return issueCouponToUser(request.getUserId(), request.getCouponPolicyId());
+        LocalDateTime userCouponExpiredAt;
+        if (policy.getCouponIssuePeriod() != null) {
+            userCouponExpiredAt = LocalDateTime.now().plusDays(policy.getCouponIssuePeriod());
+        } else if (policy.getCouponExpiredAt() != null) {
+            userCouponExpiredAt = policy.getCouponExpiredAt();
+        } else {
+            userCouponExpiredAt = LocalDateTime.now().plusDays(365);
+        }
+
+        UserCouponList userCoupon = UserCouponList.builder()
+                .userNo(request.getUserId())
+                .couponPolicy(policy)
+                .issuedAt(LocalDateTime.now())
+                .expiredAt(userCouponExpiredAt)
+                .status(UserCouponStatus.ACTIVE)
+                .build();
+
+        return userCouponListRepository.save(userCoupon);
     }
 
     public List<UserCouponList> getActiveUserCoupons(Long userNo) {
@@ -236,6 +253,7 @@ public class CouponServiceImpl implements CouponService {
         CouponPolicy policy = couponPolicyRepository.findById(couponId)
                 .orElseThrow(() -> new CouponNotFoundException(NOT_EXIST_COUPON + couponId));
         couponBookRepository.deleteByCouponPolicy(policy); // 연결된 CouponBook 먼저 삭제
+        couponCategoryRepository.deleteByCouponPolicy(policy); // 연결된 CouponCategory 먼저 삭제
         userCouponListRepository.deleteByCouponPolicy(policy); // 연결된 UsedCoupon 먼저 삭제
         couponPolicyRepository.delete(policy);
     }
@@ -327,5 +345,39 @@ public class CouponServiceImpl implements CouponService {
                 .build();
         couponBookRepository.save(couponBook);
         log.info("Coupon policy {} associated with book {}.", couponPolicyId, bookId);
+    }
+
+    @Override
+    public UserCouponList issueCategoryCoupon(Long userNo, Long couponPolicyId, Long categoryId) {
+        CouponPolicy policy = couponPolicyRepository.findById(couponPolicyId)
+                .orElseThrow(() -> new CouponNotFoundException(NOT_EXIST_COUPON + couponPolicyId));
+
+        if (policy.getCouponScope() != CouponScope.CATEGORY) {
+            throw new CouponNotApplicableException("해당 쿠폰 정책은 카테고리 전용 쿠폰이 아닙니다.");
+        }
+
+        boolean categoryCouponExists = couponCategoryRepository.existsByCouponPolicy_CouponIdAndCategoryId(couponPolicyId, categoryId);
+        if (!categoryCouponExists) {
+            throw new CouponNotApplicableException("해당 카테고리에 적용되는 쿠폰 정책이 아닙니다. Policy ID: " + couponPolicyId + ", Category ID: " + categoryId);
+        }
+
+        LocalDateTime userCouponExpiredAt;
+        if (policy.getCouponIssuePeriod() != null) {
+            userCouponExpiredAt = LocalDateTime.now().plusDays(policy.getCouponIssuePeriod());
+        } else if (policy.getCouponExpiredAt() != null) {
+            userCouponExpiredAt = policy.getCouponExpiredAt();
+        } else {
+            userCouponExpiredAt = LocalDateTime.now().plusDays(365);
+        }
+
+        UserCouponList userCoupon = UserCouponList.builder()
+                .userNo(userNo)
+                .couponPolicy(policy)
+                .issuedAt(LocalDateTime.now())
+                .expiredAt(userCouponExpiredAt)
+                .status(UserCouponStatus.ACTIVE)
+                .build();
+
+        return userCouponListRepository.save(userCoupon);
     }
 }
