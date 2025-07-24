@@ -1124,27 +1124,31 @@ class CouponServiceImplTest {
     @Test
     @DisplayName("사용자 쿠폰 발급 중 만료된 쿠폰 정책 예외 발생")
     void testIssueCouponToUser_CouponExpiredException() {
-
-        CouponPolicy testCouponPolicy = CouponPolicy.builder()
+        CouponPolicy expiredCouponPolicy = CouponPolicy.builder()
                 .couponId(2L)
                 .couponName("Test Coupon")
                 .couponDiscountType(CouponDiscountType.PERCENT)
                 .couponDiscountAmount(10)
-                .couponMinimumOrderAmount(10000)
-                .couponMaximumDiscountAmount(2000)
+                .couponMinimumOrderAmount(10_000)
+                .couponMaximumDiscountAmount(2_000)
                 .couponScope(CouponScope.ALL)
                 .couponType(CouponType.GENERAL)
                 .couponIssuePeriod(30)
                 .couponExpiredAt(LocalDateTime.now().minusDays(30))
                 .build();
 
-        when(couponPolicyRepository.findById(2L)).thenReturn(Optional.of(testCouponPolicy));
+        when(couponPolicyRepository.findById(2L))
+                .thenReturn(Optional.of(expiredCouponPolicy));
 
-        CouponExpiredException exception = assertThrows(CouponExpiredException.class,
-                () -> couponService.issueCouponToUser(100L, 2L));
-        assertTrue(exception.getMessage().contains("만료된 쿠폰 정책입니다"));
+        CouponExpiredException exception = assertThrows(
+                CouponExpiredException.class,
+                () -> couponService.issueCouponToUser(100L, 2L)
+        );
+        assertTrue(
+                exception.getMessage().contains("만료된 쿠폰 정책입니다"),
+                "예외 메시지에 '만료된 쿠폰 정책입니다'가 포함되어야 합니다"
+        );
     }
-
     @Test
     @DisplayName("도서 전용 쿠폰이 아닌 정책으로 도서 쿠폰 발급시 예외")
     void testIssueBookCoupon_NotBookScope() {
