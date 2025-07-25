@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import com.nhnacademy.controller.swagger.CouponControllerDoc;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -25,7 +26,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/coupons")
 @RequiredArgsConstructor
-public class CouponController {
+public class CouponController implements CouponControllerDoc {
 
     private final CouponService couponService;
 
